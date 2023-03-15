@@ -10,6 +10,7 @@ sourceCompatibility = '11'
 
 repositories {
 	mavenCentral()
+	maven {url "https://packages.confluent.io/maven" }
 }
 
 ext {
@@ -19,8 +20,15 @@ ext {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-
 	implementation "org.springframework.boot:spring-boot-starter-web"
+
+	implementation group: 'com.google.guava', name: 'guava', version: '11.0.2'
+
+	//apache
+	implementation 'org.apache.commons:commons-lang3:3.12.0'
+
+	//validation
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
 	//lombok
 	implementation "org.projectlombok:lombok:${lombokVersion}"
