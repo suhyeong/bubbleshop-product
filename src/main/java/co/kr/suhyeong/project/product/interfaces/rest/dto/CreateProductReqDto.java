@@ -10,6 +10,7 @@ import java.util.List;
 public class CreateProductReqDto {
     private String mainCategoryCode;
     private String subCategoryCode;
+    private String type;
     private String name;
     private int price;
     private List<String> options;

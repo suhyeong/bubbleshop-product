@@ -1,8 +1,8 @@
 package co.kr.suhyeong.project.product.interfaces.rest.validator;
 
-import co.kr.suhyeong.project.constants.StaticMessages;
 import co.kr.suhyeong.project.constants.ValidationExceptionType;
 import co.kr.suhyeong.project.product.interfaces.rest.dto.CreateProductReqDto;
+import co.kr.suhyeong.project.util.MessageConvertUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.Constraint;
@@ -10,8 +10,6 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.Payload;
 import java.lang.annotation.*;
-
-import static co.kr.suhyeong.project.constants.StaticValues.REPLACE_FIRST_STRING;
 
 @Documented
 @Constraint(validatedBy = CreateProductReqDtoValidation.Validator.class)
@@ -36,7 +34,8 @@ public @interface CreateProductReqDtoValidation {
         public boolean isValid(CreateProductReqDto value, ConstraintValidatorContext context) {
             return isProductNameValid(value.getName(), context)
                     && isCategoryCodeValid(value.getMainCategoryCode(), context)
-                    && isCategoryCodeValid(value.getSubCategoryCode(), context);
+                    && isCategoryCodeValid(value.getSubCategoryCode(), context)
+                    && isTypeValid(value.getType(), context);
         }
 
         /**
@@ -48,7 +47,7 @@ public @interface CreateProductReqDtoValidation {
         public boolean isProductNameValid(String productName, ConstraintValidatorContext context) {
             boolean result = StringUtils.isNotBlank(productName);
             if(!result)
-                addConstraintViolationException(context, this.getErrorMessageReplace("상품명", ValidationExceptionType.BLANK));
+                addConstraintViolationException(context, MessageConvertUtils.getErrorMessageReplace("상품명", ValidationExceptionType.BLANK));
             return result;
         }
 
@@ -61,23 +60,21 @@ public @interface CreateProductReqDtoValidation {
         public boolean isCategoryCodeValid(String categoryCode, ConstraintValidatorContext context) {
             boolean result = StringUtils.isNotBlank(categoryCode);
             if(!result)
-                addConstraintViolationException(context, this.getErrorMessageReplace("카테고리 코드", ValidationExceptionType.BLANK));
+                addConstraintViolationException(context, MessageConvertUtils.getErrorMessageReplace("카테고리 코드", ValidationExceptionType.BLANK));
             return result;
         }
 
         /**
-         * 에러타입에 따라 에러 메세지 치환
-         * @param errorFieldName 에러필드 이름
-         * @param exceptionType 에러 타입
+         * 상품 타입 Validation Check
+         * @param type 상품 타입
+         * @param context
          * @return
          */
-        private String getErrorMessageReplace(String errorFieldName, ValidationExceptionType exceptionType) {
-            switch (exceptionType) {
-                case BLANK:
-                    return StaticMessages.BLANK_ERROR_MESSAGE.replace(REPLACE_FIRST_STRING, errorFieldName);
-                default:
-                    return StringUtils.EMPTY;
-            }
+        public boolean isTypeValid(String type, ConstraintValidatorContext context) {
+            boolean result = StringUtils.isNotBlank(type);
+            if(!result)
+                addConstraintViolationException(context, MessageConvertUtils.getErrorMessageReplace("상품 타입", ValidationExceptionType.BLANK));
+            return result;
         }
 
         /**
