@@ -1,6 +1,9 @@
 package co.kr.suhyeong.project.product.interfaces.rest.controller;
 
+import co.kr.suhyeong.project.product.application.internal.commandservice.ProductCommandService;
+import co.kr.suhyeong.project.product.application.internal.queryservice.ProductQueryService;
 import co.kr.suhyeong.project.product.interfaces.rest.dto.CreateProductReqDto;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,8 +14,12 @@ import static co.kr.suhyeong.project.product.interfaces.rest.controller.ProductU
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping(value = PRODUCT_DEFAULT_URL)
 public class ProductController extends BaseController {
+
+    private final ProductCommandService productCommandService;
+    private final ProductQueryService productQueryService;
 
     @PostMapping(PRODUCTS)
     public ResponseEntity<Void> createProduct(@RequestBody @Validated CreateProductReqDto reqDto) {
@@ -21,7 +28,8 @@ public class ProductController extends BaseController {
     }
 
     @GetMapping(PRODUCTS)
-    public ResponseEntity<Void> getProductList() {
+    public ResponseEntity<Void> getProductList(@RequestParam(value = "0") Integer page,
+                                               @RequestParam(value = "0") Integer size) {
 
         return new ResponseEntity<>(null, getSuccessHeaders(), HttpStatus.OK);
     }
