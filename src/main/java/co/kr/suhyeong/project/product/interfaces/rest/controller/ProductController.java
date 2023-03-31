@@ -3,6 +3,7 @@ package co.kr.suhyeong.project.product.interfaces.rest.controller;
 import co.kr.suhyeong.project.product.application.internal.commandservice.ProductCommandService;
 import co.kr.suhyeong.project.product.application.internal.queryservice.ProductQueryService;
 import co.kr.suhyeong.project.product.interfaces.rest.dto.CreateProductReqDto;
+import co.kr.suhyeong.project.product.interfaces.rest.dto.EditProductReqDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -39,4 +40,11 @@ public class ProductController extends BaseController {
 
         return new ResponseEntity<>(null, getSuccessHeaders(), HttpStatus.OK);
     }
+
+    @PutMapping(PRODUCT)
+    public ResponseEntity<Void> editProduct(@PathVariable String productId, @RequestBody EditProductReqDto reqDto) {
+
+        return new ResponseEntity<>(null, getSuccessHeaders(), HttpStatus.OK);
+    }
+
 }
