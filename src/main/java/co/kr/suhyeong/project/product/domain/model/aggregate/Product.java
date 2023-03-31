@@ -1,5 +1,6 @@
 package co.kr.suhyeong.project.product.domain.model.aggregate;
 
+import co.kr.suhyeong.project.product.domain.model.converter.YOrNToBooleanConverter;
 import co.kr.suhyeong.project.product.domain.model.entity.ProductImage;
 import jdk.jfr.Description;
 import lombok.AllArgsConstructor;
@@ -34,6 +35,10 @@ public class Product extends AbstractAggregateRoot<Product> implements Serializa
 
     @Description("할인율")
     private Double discount_rate;
+
+    @Description("판매 여부")
+    @Convert(converter = YOrNToBooleanConverter.class)
+    private boolean saleYn;
 
     // TODO 상품 Aggregate 와 상품 이미지 Entity 를 1:N 관계로 매핑할 것
     @Description("상품 이미지 리스트")
