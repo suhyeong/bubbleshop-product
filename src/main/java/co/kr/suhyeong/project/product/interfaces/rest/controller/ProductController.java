@@ -2,6 +2,7 @@ package co.kr.suhyeong.project.product.interfaces.rest.controller;
 
 import co.kr.suhyeong.project.product.application.internal.commandservice.ProductCommandService;
 import co.kr.suhyeong.project.product.application.internal.queryservice.ProductQueryService;
+import co.kr.suhyeong.project.product.domain.model.aggregate.Product;
 import co.kr.suhyeong.project.product.interfaces.rest.dto.CreateProductReqDto;
 import co.kr.suhyeong.project.product.interfaces.rest.dto.EditProductReqDto;
 import lombok.RequiredArgsConstructor;
@@ -36,9 +37,9 @@ public class ProductController extends BaseController {
     }
 
     @GetMapping(PRODUCT)
-    public ResponseEntity<Void> getProduct(@PathVariable String productId) {
-
-        return new ResponseEntity<>(null, getSuccessHeaders(), HttpStatus.OK);
+    public ResponseEntity<Object> getProduct(@PathVariable String productId) {
+        Product product = productQueryService.getProduct(productId);
+        return new ResponseEntity<>(product, getSuccessHeaders(), HttpStatus.OK);
     }
 
     @PutMapping(PRODUCT)
