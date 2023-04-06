@@ -1,0 +1,93 @@
+# 기본 환경 세팅
+spring:
+  profiles:
+    active: local
+---
+# profile Group
+spring:
+  profiles:
+    group:
+      "local": common-config, classpath-property
+      "unit-test": common-config, classpath-property
+      "dev": common-config, classpath-property, cloud-property
+      "stg": common-config, classpath-property, cloud-property
+      "prd": common-config, classpath-property, cloud-property
+---
+#환경별 공통세팅
+spring:
+  application:
+    name: product-project
+  config:
+    activate:
+      on-profile: common-config
+  flyway:
+    enabled: false
+---
+# 로컬
+spring:
+  config:
+    activate:
+      on-profile: local, default
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username:
+    password:
+    url:
+---
+# 유닛 테스트
+spring:
+  config:
+    activate:
+      on-profile: unit-test
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username:
+    password:
+    url:
+---
+# 개발
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username:
+    password:
+    url:
+---
+# 스테이징
+spring:
+  config:
+    activate:
+      on-profile: stg
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username:
+    password:
+    url:
+---
+# 운영
+spring:
+  config:
+    activate:
+      on-profile: prd
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username:
+    password:
+    url:
+---
+# properties 사용을 위한 profile
+spring:
+  config:
+    activate:
+      on-profile: classpath-property
+    import: "classpath:properties/product/product-${spring.profiles.active}.yaml"
+---
+# cloud properties 사용을 위한 profile
+spring:
+  config:
+    activate:
+      on-profile: cloud-property
+---
