@@ -15,6 +15,7 @@ repositories {
 
 ext {
 	lombokVersion = '1.18.22'
+	flywayVersion = '7.15.0'
 }
 
 dependencies {
@@ -44,6 +45,9 @@ dependencies {
 	//mysql
 	implementation 'mysql:mysql-connector-java'
 	implementation 'com.h2database:h2'
+
+	//flyway
+	implementation "org.flywaydb:flyway-core:${flywayVersion}"
 }
 
 tasks.named('test') {
