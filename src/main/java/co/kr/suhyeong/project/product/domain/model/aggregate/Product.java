@@ -56,8 +56,4 @@ public class Product extends AbstractAggregateRoot<Product> implements Serializa
     @Column(name = "chn_dt")
     private LocalDateTime modifiedDate;
 
-    // TODO 상품 Aggregate 와 상품 이미지 Entity 를 1:N 관계로 매핑할 것
-//    @Description("상품 이미지 리스트")
-//    @OneToMany(mappedBy = "productImageId.productCode")
-//    private List<ProductImage> productImageList;
 }

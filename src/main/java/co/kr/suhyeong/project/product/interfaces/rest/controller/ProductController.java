@@ -1,8 +1,12 @@
 package co.kr.suhyeong.project.product.interfaces.rest.controller;
 
 import co.kr.suhyeong.project.product.application.internal.commandservice.ProductCommandService;
+import co.kr.suhyeong.project.product.application.internal.queryservice.ProductImageQueryService;
 import co.kr.suhyeong.project.product.application.internal.queryservice.ProductQueryService;
+import co.kr.suhyeong.project.product.domain.command.GetProductImageCommand;
+import co.kr.suhyeong.project.product.domain.constant.ProductImageCode;
 import co.kr.suhyeong.project.product.domain.model.aggregate.Product;
+import co.kr.suhyeong.project.product.domain.model.entity.ProductImage;
 import co.kr.suhyeong.project.product.interfaces.rest.dto.CreateProductReqDto;
 import co.kr.suhyeong.project.product.interfaces.rest.dto.EditProductReqDto;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +15,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static co.kr.suhyeong.project.product.interfaces.rest.controller.ProductUrl.*;
 
@@ -22,6 +29,7 @@ public class ProductController extends BaseController {
 
     private final ProductCommandService productCommandService;
     private final ProductQueryService productQueryService;
+    private final ProductImageQueryService productImageQueryService;
 
     @PostMapping(PRODUCTS)
     public ResponseEntity<Void> createProduct(@RequestBody @Validated CreateProductReqDto reqDto) {
@@ -45,6 +53,22 @@ public class ProductController extends BaseController {
     @PutMapping(PRODUCT)
     public ResponseEntity<Void> editProduct(@PathVariable String productId, @RequestBody EditProductReqDto reqDto) {
 
+        return new ResponseEntity<>(null, getSuccessHeaders(), HttpStatus.OK);
+    }
+
+    @GetMapping(PRODUCT_IMAGE)
+    public ResponseEntity<Void> getProductImageByProductCode(@PathVariable String productId, @RequestParam String divCode) {
+        String[] divCodes = divCode.split(",");
+        List<ProductImageCode> codeList = new ArrayList<>();
+        for(String code : divCodes) {
+            codeList.add(ProductImageCode.find(code));
+        }
+        GetProductImageCommand command = GetProductImageCommand.builder()
+                .productCode(productId)
+                .productImageCodeList(codeList)
+                .build();
+        List<ProductImage> list = productImageQueryService.getProductImages(command);
+        log.info("product image list : {}", list);
         return new ResponseEntity<>(null, getSuccessHeaders(), HttpStatus.OK);
     }
 
