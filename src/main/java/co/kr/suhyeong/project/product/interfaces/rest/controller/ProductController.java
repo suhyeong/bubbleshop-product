@@ -9,6 +9,8 @@ import co.kr.suhyeong.project.product.domain.model.aggregate.Product;
 import co.kr.suhyeong.project.product.domain.model.entity.ProductImage;
 import co.kr.suhyeong.project.product.interfaces.rest.dto.CreateProductReqDto;
 import co.kr.suhyeong.project.product.interfaces.rest.dto.EditProductReqDto;
+import co.kr.suhyeong.project.product.interfaces.rest.dto.GetProductImageDetailRspDto;
+import co.kr.suhyeong.project.product.interfaces.rest.dto.GetProductImageRspDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -57,7 +59,7 @@ public class ProductController extends BaseController {
     }
 
     @GetMapping(PRODUCT_IMAGE)
-    public ResponseEntity<Void> getProductImageByProductCode(@PathVariable String productId, @RequestParam String divCode) {
+    public ResponseEntity<GetProductImageRspDto> getProductImageByProductCode(@PathVariable String productId, @RequestParam String divCode) {
         String[] divCodes = divCode.split(",");
         List<ProductImageCode> codeList = new ArrayList<>();
         for(String code : divCodes) {
@@ -69,7 +71,18 @@ public class ProductController extends BaseController {
                 .build();
         List<ProductImage> list = productImageQueryService.getProductImages(command);
         log.info("product image list : {}", list);
-        return new ResponseEntity<>(null, getSuccessHeaders(), HttpStatus.OK);
+
+        // TODO Mapper
+        List<GetProductImageDetailRspDto> details = new ArrayList<>();
+        for(ProductImage image : list) {
+            GetProductImageDetailRspDto imageDetailRspDto = GetProductImageDetailRspDto.builder().divCode(image.getDivCode().getCode()).path(image.getImgPath()).build();
+            details.add(imageDetailRspDto);
+        }
+        GetProductImageRspDto rspDto = GetProductImageRspDto.builder().productId(productId).details(details).build();
+
+        return ResponseEntity.ok()
+                .headers(getSuccessHeaders())
+                .body(rspDto);
     }
 
 }

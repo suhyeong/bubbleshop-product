@@ -1,10 +1,12 @@
 package co.kr.suhyeong.project.product.interfaces.rest.controller;
 
+import co.kr.suhyeong.project.constants.ResponseCode;
 import org.springframework.http.HttpHeaders;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 
-import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static co.kr.suhyeong.project.constants.StaticValues.RESULT_CODE;
@@ -14,8 +16,8 @@ public class BaseController {
 
     public HttpHeaders getSuccessHeaders() {
         HttpHeaders headers = new HttpHeaders();
-        headers.add(RESULT_CODE, "0000");
-        headers.add(RESULT_MESSAGE, "성공");
+        headers.add(RESULT_CODE, ResponseCode.SUCCESS.getResponseCode());
+        headers.add(RESULT_MESSAGE, URLEncoder.encode(ResponseCode.SUCCESS.getMessage(), StandardCharsets.UTF_8));
         return headers;
     }
 

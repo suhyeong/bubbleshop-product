@@ -1,4 +1,4 @@
-package co.kr.suhyeong.project.constants;
+package co.kr.suhyeong.project.product.domain.constant;
 
 import lombok.Getter;
 

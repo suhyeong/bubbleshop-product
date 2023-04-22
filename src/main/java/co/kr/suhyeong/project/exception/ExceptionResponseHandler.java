@@ -1,5 +1,6 @@
 package co.kr.suhyeong.project.exception;
 
+import co.kr.suhyeong.project.constants.ApiException;
 import co.kr.suhyeong.project.constants.ResponseCode;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +15,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.print.DocFlavor;
 import javax.validation.ConstraintViolationException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static co.kr.suhyeong.project.constants.StaticValues.RESULT_CODE;
@@ -27,7 +31,14 @@ public class ExceptionResponseHandler extends ResponseEntityExceptionHandler {
     private HttpHeaders getErrorHeader(ResponseCode responseCode, String customMessage) {
         HttpHeaders headers = new HttpHeaders();
         headers.add(RESULT_CODE, responseCode.getResponseCode());
-        headers.add(RESULT_MESSAGE, StringUtils.defaultIfBlank(customMessage, responseCode.getMessage())); // TODO 인코딩 하지 않으면 한글 깨짐
+        headers.add(RESULT_MESSAGE, URLEncoder.encode(StringUtils.defaultIfBlank(customMessage, responseCode.getMessage()), StandardCharsets.UTF_8));
+        return headers;
+    }
+
+    private HttpHeaders getErrorHeader(String resultCode, String resultMessage) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(RESULT_CODE, resultCode);
+        headers.add(RESULT_MESSAGE, URLEncoder.encode(resultMessage, StandardCharsets.UTF_8));
         return headers;
     }
 
@@ -40,7 +51,7 @@ public class ExceptionResponseHandler extends ResponseEntityExceptionHandler {
         BindingResult bindingResult = ex.getBindingResult();
 
         bindingResult.getAllErrors().forEach(error -> {
-            log.info("MethodArgumentNotValidException 에러 발생, 메세지 : {}", error.getDefaultMessage());
+            log.error("MethodArgumentNotValidException 에러 발생, 메세지 : {}", error.getDefaultMessage());
             if (StringUtils.isNotBlank(error.getDefaultMessage()))
                 message.set(error.getDefaultMessage());
         });
@@ -54,7 +65,7 @@ public class ExceptionResponseHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ConstraintViolationException.class)
     protected ResponseEntity<ExceptionResponseDto> handleException(ConstraintViolationException exception) {
-        log.info("ConstraintViolationException 에러 발생, 메세지 : {}", exception.getMessage());
+        log.error("ConstraintViolationException 에러 발생, 메세지 : {}", exception.getMessage());
         ResponseCode responseCode = ResponseCode.INVALID_PARAMETER;
         String message = responseCode.getMessage();
 
@@ -91,4 +102,11 @@ public class ExceptionResponseHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(responseDto, getErrorHeader(responseCode, message.get()), responseCode.getStatus());
     }
      */
+
+    @ExceptionHandler(ApiException.class)
+    protected ResponseEntity<Void> handler(ApiException apiException) {
+        log.error("ApiException error code : {}, error message : {}", apiException.getResultCode(), apiException.getResultMessage());
+        return new ResponseEntity<>(getErrorHeader(apiException.getResultCode(), apiException.getResultMessage()), apiException.getHttpStatus());
+    }
+
 }
