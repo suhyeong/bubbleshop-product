@@ -9,8 +9,8 @@ import co.kr.suhyeong.project.product.domain.model.aggregate.Product;
 import co.kr.suhyeong.project.product.domain.model.entity.ProductImage;
 import co.kr.suhyeong.project.product.interfaces.rest.dto.CreateProductReqDto;
 import co.kr.suhyeong.project.product.interfaces.rest.dto.EditProductReqDto;
-import co.kr.suhyeong.project.product.interfaces.rest.dto.GetProductImageDetailRspDto;
 import co.kr.suhyeong.project.product.interfaces.rest.dto.GetProductImageRspDto;
+import co.kr.suhyeong.project.product.interfaces.rest.transform.GetProductImageCommandDTOAssembler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -32,6 +32,8 @@ public class ProductController extends BaseController {
     private final ProductCommandService productCommandService;
     private final ProductQueryService productQueryService;
     private final ProductImageQueryService productImageQueryService;
+
+    private final GetProductImageCommandDTOAssembler getProductImageCommandDTOAssembler;
 
     @PostMapping(PRODUCTS)
     public ResponseEntity<Void> createProduct(@RequestBody @Validated CreateProductReqDto reqDto) {
@@ -72,13 +74,7 @@ public class ProductController extends BaseController {
         List<ProductImage> list = productImageQueryService.getProductImages(command);
         log.info("product image list : {}", list);
 
-        // TODO Mapper
-        List<GetProductImageDetailRspDto> details = new ArrayList<>();
-        for(ProductImage image : list) {
-            GetProductImageDetailRspDto imageDetailRspDto = GetProductImageDetailRspDto.builder().divCode(image.getDivCode().getCode()).path(image.getImgPath()).build();
-            details.add(imageDetailRspDto);
-        }
-        GetProductImageRspDto rspDto = GetProductImageRspDto.builder().productId(productId).details(details).build();
+        GetProductImageRspDto rspDto = getProductImageCommandDTOAssembler.toRspDTO(list, productId);
 
         return ResponseEntity.ok()
                 .headers(getSuccessHeaders())
