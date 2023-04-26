@@ -4,15 +4,19 @@ import co.kr.suhyeong.project.product.application.internal.commandservice.Produc
 import co.kr.suhyeong.project.product.application.internal.queryservice.ProductImageQueryService;
 import co.kr.suhyeong.project.product.application.internal.queryservice.ProductQueryService;
 import co.kr.suhyeong.project.product.domain.command.GetProductImageCommand;
+import co.kr.suhyeong.project.product.domain.command.GetProductListCommand;
 import co.kr.suhyeong.project.product.domain.constant.ProductImageCode;
 import co.kr.suhyeong.project.product.domain.model.aggregate.Product;
 import co.kr.suhyeong.project.product.domain.model.entity.ProductImage;
 import co.kr.suhyeong.project.product.interfaces.rest.dto.CreateProductReqDto;
 import co.kr.suhyeong.project.product.interfaces.rest.dto.EditProductReqDto;
 import co.kr.suhyeong.project.product.interfaces.rest.dto.GetProductImageRspDto;
+import co.kr.suhyeong.project.product.interfaces.rest.dto.GetProductListRspDto;
 import co.kr.suhyeong.project.product.interfaces.rest.transform.GetProductImageCommandDTOAssembler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -42,10 +46,14 @@ public class ProductController extends BaseController {
     }
 
     @GetMapping(PRODUCTS)
-    public ResponseEntity<Void> getProductList(@RequestParam(value = "0") Integer page,
-                                               @RequestParam(value = "0") Integer size) {
+    public ResponseEntity<List<Product>> getProductList(@RequestParam(required = false, defaultValue = "1") Integer page,
+                                               @RequestParam(required = false, defaultValue = "0") Integer size) {
+        GetProductListCommand command = GetProductListCommand.builder().pageable(PageRequest.of(page-1, size)).build();
+        List<Product> productList = productQueryService.getProductList(command);
 
-        return new ResponseEntity<>(null, getSuccessHeaders(), HttpStatus.OK);
+        return ResponseEntity.ok()
+                .headers(getSuccessHeaders())
+                .body(productList);
     }
 
     @GetMapping(PRODUCT)

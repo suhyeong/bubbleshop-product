@@ -1,21 +1,23 @@
 package co.kr.suhyeong.project.product.domain.model.aggregate;
 
 import co.kr.suhyeong.project.product.domain.model.converter.YOrNToBooleanConverter;
-import co.kr.suhyeong.project.product.domain.model.entity.ProductImage;
 import jdk.jfr.Description;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.data.domain.AbstractAggregateRoot;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(name = "product_master")
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
+@Getter
 public class Product extends AbstractAggregateRoot<Product> implements Serializable {
 
     @Id
