@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static co.kr.suhyeong.project.constants.ResponseCode.DB_ERROR;
 import static co.kr.suhyeong.project.constants.ResponseCode.NON_EXIST_DATA;
 
 @Service
@@ -21,13 +22,19 @@ public class ProductImageQueryService {
 
     @Transactional(readOnly = true)
     public List<ProductImage> getProductImages(GetProductImageCommand command) {
-        List<ProductImage> productImageList = productImageRepository.findByProductImageId_ProductCodeAndAndDivCodeIn(
-                command.getProductCode(), command.getProductImageCodeList()
-        );
+        try {
+            List<ProductImage> productImageList = productImageRepository.findByProductImageId_ProductCodeAndAndDivCodeIn(
+                    command.getProductCode(), command.getProductImageCodeList()
+            );
 
-        if(productImageList.isEmpty())
-            throw new ApiException(NON_EXIST_DATA);
+            if(productImageList.isEmpty())
+                throw new ApiException(NON_EXIST_DATA);
 
-        return productImageList;
+            return productImageList;
+        } catch (Exception e) {
+            if(e instanceof ApiException)
+                throw e;
+            throw new ApiException(DB_ERROR);
+        }
     }
 }

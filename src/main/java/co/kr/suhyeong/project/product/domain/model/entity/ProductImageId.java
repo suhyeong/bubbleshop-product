@@ -1,10 +1,7 @@
 package co.kr.suhyeong.project.product.domain.model.entity;
 
 import jdk.jfr.Description;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -12,6 +9,7 @@ import java.io.Serializable;
 
 @Embeddable
 @NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode
 @Getter
 @ToString

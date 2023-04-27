@@ -72,6 +72,9 @@ dependencies {
 
 	//flyway
 	implementation "org.flywaydb:flyway-core:${flywayVersion}"
+
+	//mockito
+	testImplementation('org.mockito:mockito-inline:4.3.1')
 }
 
 tasks.named('test') {
