@@ -70,20 +70,9 @@ public class ProductController extends BaseController {
 
     @GetMapping(PRODUCT_IMAGE)
     public ResponseEntity<GetProductImageRspDto> getProductImageByProductCode(@PathVariable String productId, @RequestParam String divCode) {
-        String[] divCodes = divCode.split(",");
-        List<ProductImageCode> codeList = new ArrayList<>();
-        for(String code : divCodes) {
-            codeList.add(ProductImageCode.find(code));
-        }
-        GetProductImageCommand command = GetProductImageCommand.builder()
-                .productCode(productId)
-                .productImageCodeList(codeList)
-                .build();
+        GetProductImageCommand command = getProductImageCommandDTOAssembler.toCommand(productId, divCode);
         List<ProductImage> list = productImageQueryService.getProductImages(command);
-        log.info("product image list : {}", list);
-
         GetProductImageRspDto rspDto = getProductImageCommandDTOAssembler.toRspDTO(list, productId);
-
         return ResponseEntity.ok()
                 .headers(getSuccessHeaders())
                 .body(rspDto);
