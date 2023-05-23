@@ -1,6 +1,6 @@
 package co.kr.suhyeong.project.product.application.internal.queryservice;
 
-import co.kr.suhyeong.project.constants.ApiException;
+import co.kr.suhyeong.project.exception.ApiException;
 import co.kr.suhyeong.project.product.domain.command.GetProductImageCommand;
 import co.kr.suhyeong.project.product.domain.model.entity.ProductImage;
 import co.kr.suhyeong.project.product.domain.repository.ProductImageRepository;

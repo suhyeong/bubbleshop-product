@@ -1,6 +1,5 @@
 package co.kr.suhyeong.project.exception;
 
-import co.kr.suhyeong.project.constants.ApiException;
 import co.kr.suhyeong.project.constants.ResponseCode;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import javax.print.DocFlavor;
 import javax.validation.ConstraintViolationException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;

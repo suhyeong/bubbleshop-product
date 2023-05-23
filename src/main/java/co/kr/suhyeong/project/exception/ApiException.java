@@ -1,5 +1,6 @@
-package co.kr.suhyeong.project.constants;
+package co.kr.suhyeong.project.exception;
 
+import co.kr.suhyeong.project.constants.ResponseCode;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 

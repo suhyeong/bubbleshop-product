@@ -1,6 +1,6 @@
 package co.kr.suhyeong.project.product.application.internal.queryservice;
 
-import co.kr.suhyeong.project.constants.ApiException;
+import co.kr.suhyeong.project.exception.ApiException;
 import co.kr.suhyeong.project.product.domain.command.GetProductImageCommand;
 import co.kr.suhyeong.project.product.domain.constant.ProductImageCode;
 import co.kr.suhyeong.project.product.domain.model.entity.ProductImage;
@@ -43,7 +43,7 @@ class ProductImageQueryServiceTest {
         //when
         //실제로 수행할 메소드를 호출한다.
         List<ProductImage> actual = productImageQueryService.getProductImages(GetProductImageCommand.builder().productCode("001").productImageCodeList(List.of()).build());
-;
+
         //then
         //결과값을 확인한다.
         assertThat(actual.size()).isEqualTo(2);

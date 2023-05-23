@@ -1,14 +1,19 @@
 package co.kr.suhyeong.project.product.domain.command;
 
-import co.kr.suhyeong.project.constants.CategoryCode;
+import co.kr.suhyeong.project.product.domain.constant.CategoryCode;
+import co.kr.suhyeong.project.product.domain.constant.OptionType;
+import lombok.Builder;
 import lombok.Getter;
 
-import java.util.List;
+import java.util.Set;
 
 @Getter
+@Builder
 public class CreateProductCommand {
     private CategoryCode categoryCode;
     private String name;
     private int price;
-    private List<String> options;
+    private Set<OptionType> options;
+    private String thumbnailImagePath;
+    private String detailImagePath;
 }
