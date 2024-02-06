@@ -21,10 +21,12 @@ spring:
     activate:
       on-profile: common-config
   flyway:
-    enabled: true
-    baseline-on-migrate: true
-    clean-on-validation-error: true
-    locations: classpath:db/migration
+    enabled: false
+
+logging:
+  level:
+    co.kr.suhyeong.project.product.infrastructure.feignclient: debug
+
 ---
 # 로컬
 spring:
@@ -48,10 +50,19 @@ spring:
     activate:
       on-profile: unit-test
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    username:
+    driver-class-name: org.h2.Driver
+    url: "jdbc:h2:mem:./data/localdb;"
+    username: sa
     password:
-    url:
+  h2:
+    console:
+      enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: create
+
+host:
+  member: localhost:8080
 ---
 # 개발
 spring:

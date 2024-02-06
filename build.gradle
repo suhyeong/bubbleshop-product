@@ -19,6 +19,7 @@ ext {
 	mapStructVersion = '1.5.5.Final'
 	lombokMapstructBindVersion = '0.2.0'
 	querydslVersion = '5.0.0'
+	springCloudVersion = '2021.0.3'
 }
 
 dependencies {
@@ -75,9 +76,25 @@ dependencies {
 
 	//mockito
 	testImplementation('org.mockito:mockito-inline:4.3.1')
+
+	//open feign
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+	implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j'
+
+	testImplementation 'org.springframework.cloud:spring-cloud-contract-wiremock'
+	testImplementation group: 'com.squareup.okhttp3', name: 'mockwebserver', version: '4.10.0'
+	testImplementation 'org.mock-server:mockserver-netty:5.12.0'
+	testImplementation "org.springframework.cloud:spring-cloud-starter-contract-stub-runner"
+	testImplementation "org.wiremock:wiremock:3.3.1"
 }
 
-tasks.named('test') {
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
+}
+
+test {
 	systemProperty 'spring.profiles.active', 'unit-test'
 	useJUnitPlatform()
 }

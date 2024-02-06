@@ -104,7 +104,7 @@ public class ExceptionResponseHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ApiException.class)
     protected ResponseEntity<Void> handler(ApiException apiException) {
         log.error("ApiException error code : {}, error message : {}", apiException.getResultCode(), apiException.getResultMessage());
-        return new ResponseEntity<>(getErrorHeader(apiException.getResultCode(), apiException.getResultMessage()), apiException.getHttpStatus());
+        return new ResponseEntity<>(null, getErrorHeader(apiException.getResultCode(), apiException.getResultMessage()), apiException.getHttpStatus());
     }
 
 }
