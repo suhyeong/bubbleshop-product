@@ -62,7 +62,7 @@ spring:
       ddl-auto: create
 
 host:
-  member: localhost:8080
+  member: http://localhost:${wiremock.server.port}
 ---
 # 개발
 spring:

@@ -1,0 +1,14 @@
+{
+  "request":{
+    "method":"GET",
+    "urlPath":"/member/v1/member/000"
+  },
+  "response":{
+    "headers":{
+      "Content-Type":"application/json",
+      "resultCode": "0004",
+      "resultMessage": "데이터가 존재하지 않습니다."
+    },
+    "status":404
+  }
+}

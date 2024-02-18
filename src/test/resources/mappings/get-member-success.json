@@ -1,0 +1,15 @@
+{
+  "request":{
+    "method":"GET",
+    "urlPath":"/member/v1/member/123"
+  },
+  "response":{
+    "headers":{
+      "Content-Type":"application/json",
+      "resultCode": "0000",
+      "resultMessage": "성공"
+    },
+    "status":200,
+    "body":"{\"memberId\":\"testid\",\"memberName\":\"홍길동\"}"
+  }
+}

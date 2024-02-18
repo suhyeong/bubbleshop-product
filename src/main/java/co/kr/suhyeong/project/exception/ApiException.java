@@ -8,12 +8,20 @@ import org.springframework.http.HttpStatus;
 public class ApiException extends RuntimeException {
     private String resultCode;
     private String resultMessage;
-    private HttpStatus httpStatus;
+    private int httpStatus;
 
     public ApiException(ResponseCode responseCode) {
         super(responseCode.getMessage());
         this.resultCode = responseCode.getResponseCode();
         this.resultMessage = responseCode.getMessage();
-        this.httpStatus = responseCode.getStatus();
+        this.httpStatus = responseCode.getStatus().value();
     }
+
+    public ApiException(String resultCode, String resultMessage, int httpStatus) {
+        super(resultMessage);
+        this.resultCode = resultCode;
+        this.resultMessage = resultMessage;
+        this.httpStatus = httpStatus;
+    }
+
 }
