@@ -12,6 +12,7 @@ import co.kr.suhyeong.project.product.interfaces.rest.dto.CreateProductReqDto;
 import co.kr.suhyeong.project.product.interfaces.rest.dto.EditProductReqDto;
 import co.kr.suhyeong.project.product.interfaces.rest.dto.GetProductImageRspDto;
 import co.kr.suhyeong.project.product.interfaces.rest.dto.GetProductListRspDto;
+import co.kr.suhyeong.project.product.interfaces.rest.transform.CreateProductCommandDTOAssembler;
 import co.kr.suhyeong.project.product.interfaces.rest.transform.GetProductImageCommandDTOAssembler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,11 +38,12 @@ public class ProductController extends BaseController {
     private final ProductQueryService productQueryService;
     private final ProductImageQueryService productImageQueryService;
 
+    private final CreateProductCommandDTOAssembler createProductCommandDTOAssembler;
     private final GetProductImageCommandDTOAssembler getProductImageCommandDTOAssembler;
 
     @PostMapping(PRODUCTS)
     public ResponseEntity<Void> createProduct(@RequestBody @Validated CreateProductReqDto reqDto) {
-
+        productCommandService.createProduct(createProductCommandDTOAssembler.toCommand(reqDto));
         return new ResponseEntity<>(null, getSuccessHeaders(), HttpStatus.OK);
     }
 

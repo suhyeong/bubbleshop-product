@@ -16,4 +16,5 @@ public class CreateProductCommand {
     private Set<OptionType> options;
     private String thumbnailImagePath;
     private String detailImagePath;
+    private boolean isSale;
 }

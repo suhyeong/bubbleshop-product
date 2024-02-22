@@ -1,12 +1,16 @@
 package co.kr.suhyeong.project.product.domain.model.aggregate;
 
+import co.kr.suhyeong.project.product.domain.command.CreateProductCommand;
 import co.kr.suhyeong.project.product.domain.model.converter.YOrNToBooleanConverter;
 import jdk.jfr.Description;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.domain.AbstractAggregateRoot;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -18,6 +22,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @ToString
 @Getter
+@EntityListeners(AuditingEntityListener.class)
 public class Product extends AbstractAggregateRoot<Product> implements Serializable {
 
     @Id
@@ -52,10 +57,21 @@ public class Product extends AbstractAggregateRoot<Product> implements Serializa
 
     @Description("생성 일시")
     @Column(name = "crt_dt")
+    @CreatedDate
     private LocalDateTime createdDate;
 
     @Description("수정 일시")
     @Column(name = "chn_dt")
+    @LastModifiedDate
     private LocalDateTime modifiedDate;
 
+    public Product(CreateProductCommand command) {
+        this.productCode = "01"; // TODO 메인 카테고리, 서브 카테고리, 현재 일자 기준으로 규칙 만들기
+        this.productName = command.getName();
+        this.mainCategoryCode = command.getCategoryCode().getMainCode();
+        this.subCategoryCode =  command.getCategoryCode().getSubCode();
+        this.cost = command.getPrice();
+        this.discount_rate = 0.0;
+        this.saleYn = command.isSale();
+    }
 }
