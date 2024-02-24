@@ -9,4 +9,5 @@ import java.util.List;
 
 public interface ProductImageRepository extends JpaRepository<ProductImage, ProductImageId> {
     List<ProductImage> findByProductImageId_ProductCodeAndAndDivCodeIn(String productCode, List<ProductImageCode> imageCodes);
+    List<ProductImage> findByProductImageId_ProductCode(String productCode);
 }

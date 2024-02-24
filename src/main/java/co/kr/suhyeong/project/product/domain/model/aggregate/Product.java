@@ -2,6 +2,7 @@ package co.kr.suhyeong.project.product.domain.model.aggregate;
 
 import co.kr.suhyeong.project.product.domain.command.CreateProductCommand;
 import co.kr.suhyeong.project.product.domain.model.converter.YOrNToBooleanConverter;
+import co.kr.suhyeong.project.product.domain.model.entity.TimeEntity;
 import jdk.jfr.Description;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,8 +23,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @ToString
 @Getter
-@EntityListeners(AuditingEntityListener.class)
-public class Product extends AbstractAggregateRoot<Product> implements Serializable {
+public class Product extends TimeEntity implements Serializable {
 
     @Id
     @Description("상품 코드")
@@ -55,18 +55,8 @@ public class Product extends AbstractAggregateRoot<Product> implements Serializa
     @Column(name = "sale_yn")
     private boolean saleYn;
 
-    @Description("생성 일시")
-    @Column(name = "crt_dt")
-    @CreatedDate
-    private LocalDateTime createdDate;
-
-    @Description("수정 일시")
-    @Column(name = "chn_dt")
-    @LastModifiedDate
-    private LocalDateTime modifiedDate;
-
     public Product(CreateProductCommand command) {
-        this.productCode = "01"; // TODO 메인 카테고리, 서브 카테고리, 현재 일자 기준으로 규칙 만들기
+        this.productCode = "02"; // TODO 메인 카테고리, 서브 카테고리, 현재 일자 기준으로 규칙 만들기
         this.productName = command.getName();
         this.mainCategoryCode = command.getCategoryCode().getMainCode();
         this.subCategoryCode =  command.getCategoryCode().getSubCode();
