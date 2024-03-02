@@ -1,9 +1,12 @@
 package co.kr.suhyeong.project.product.domain.model.entity;
 
+import co.kr.suhyeong.project.product.domain.constant.ProductImageCode;
+import co.kr.suhyeong.project.product.domain.model.converter.ProductImageCodeConverter;
 import jdk.jfr.Description;
 import lombok.*;
 
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Embeddable;
 import java.io.Serializable;
 
@@ -18,7 +21,8 @@ public class ProductImageId implements Serializable {
     @Column(name = "product_code")
     private String productCode;
 
-    @Description("상품 이미지 순번")
-    @Column(name = "product_img_seq")
-    private int productImgSeq;
+    @Description("이미지 구분 코드")
+    @Column(name = "img_div_code")
+    @Convert(converter = ProductImageCodeConverter.class)
+    private ProductImageCode divCode;
 }

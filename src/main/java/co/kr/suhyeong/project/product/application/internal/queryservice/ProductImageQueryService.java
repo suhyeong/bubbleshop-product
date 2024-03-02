@@ -17,13 +17,13 @@ import static co.kr.suhyeong.project.constants.ResponseCode.NON_EXIST_DATA;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ProductImageQueryService {
     private final ProductImageRepository productImageRepository;
 
-    @Transactional(readOnly = true)
     public List<ProductImage> getProductImages(GetProductImageCommand command) {
         try {
-            List<ProductImage> productImageList = productImageRepository.findByProductImageId_ProductCodeAndAndDivCodeIn(
+            List<ProductImage> productImageList = productImageRepository.findByProductImageId_ProductCodeAndProductImageId_DivCodeIn(
                     command.getProductCode(), command.getProductImageCodeList()
             );
 

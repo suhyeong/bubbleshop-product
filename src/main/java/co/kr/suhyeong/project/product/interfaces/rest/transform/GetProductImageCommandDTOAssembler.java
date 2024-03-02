@@ -45,7 +45,7 @@ public abstract class GetProductImageCommandDTOAssembler {
     }
 
     @Mappings({
-            @Mapping(target = "divCode", source = "productImage.divCode.code"),
+            @Mapping(target = "divCode", source = "productImage.productImageId.divCode.code"),
             @Mapping(target = "path", source = "productImage.imgPath")
     })
     abstract GetProductImageDetailRspDto toRspDetailDTO(ProductImage productImage);

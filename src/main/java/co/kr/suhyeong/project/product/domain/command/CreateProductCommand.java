@@ -17,4 +17,12 @@ public class CreateProductCommand {
     private String thumbnailImagePath;
     private String detailImagePath;
     private boolean isSale;
+
+    public boolean isThumbnailImageExist() {
+        return !this.thumbnailImagePath.isBlank();
+    }
+
+    public boolean isDetailImageExist() {
+        return !this.detailImagePath.isBlank();
+    }
 }

@@ -36,9 +36,9 @@ class ProductImageQueryServiceTest {
         // 데이터 모킹처리를 진행한다.
         // 해당 테스트 파일에서 수행되는 메소드 내부에 필요한 응답값들을 모킹처리해주면 된다.
         // 해당 서비스 내에서는 레포지토리에서 가져온 값이 모킹처리 되어야 한다.
-        ProductImage image1 = new ProductImage(new ProductImageId("001", 1), ProductImageCode.THUMBNAIL_IMAGE, "path1");
-        ProductImage image2 = new ProductImage(new ProductImageId("001", 2), ProductImageCode.THUMBNAIL_IMAGE, "path2");
-        given(productImageRepository.findByProductImageId_ProductCodeAndAndDivCodeIn(anyString(), anyList())).willReturn(List.of(image1, image2));
+        ProductImage image1 = new ProductImage(new ProductImageId("001", ProductImageCode.THUMBNAIL_IMAGE), "path1");
+        ProductImage image2 = new ProductImage(new ProductImageId("001", ProductImageCode.FULL_DETAIL_IMAGE), "path2");
+        given(productImageRepository.findByProductImageId_ProductCodeAndProductImageId_DivCodeIn(anyString(), anyList())).willReturn(List.of(image1, image2));
         
         //when
         //실제로 수행할 메소드를 호출한다.
@@ -56,7 +56,7 @@ class ProductImageQueryServiceTest {
     @DisplayName("DB 에서 데이터 조회시 데이터가 없어 에러가 발생한다.")
     void getProductImages_no_data() {
         //given
-        given(productImageRepository.findByProductImageId_ProductCodeAndAndDivCodeIn(anyString(), anyList())).willReturn(List.of());
+        given(productImageRepository.findByProductImageId_ProductCodeAndProductImageId_DivCodeIn(anyString(), anyList())).willReturn(List.of());
 
         //when
         Exception exception = assertThrows(Exception.class, () -> productImageQueryService.getProductImages(GetProductImageCommand.builder().productCode("001").productImageCodeList(List.of()).build()));
@@ -69,7 +69,7 @@ class ProductImageQueryServiceTest {
     @DisplayName("DB 조회시 DB 에서 알 수 없는 에러가 발생한다.")
     void getProductImages_db_error() {
         //given
-        given(productImageRepository.findByProductImageId_ProductCodeAndAndDivCodeIn(anyString(), anyList()))
+        given(productImageRepository.findByProductImageId_ProductCodeAndProductImageId_DivCodeIn(anyString(), anyList()))
                 .willThrow(new MockitoException("DB 에러가 났다고 가정해볼까요?"));
 
         //when
