@@ -35,4 +35,12 @@ public class ProductImage extends TimeEntity {
     public void modifyProductThumbnailImagePath(String changePath) {
         this.imgPath = changePath;
     }
+
+    public boolean isThumbnailImage() {
+        return this.productImageId.isThumbnailImage();
+    }
+
+    public boolean isDetailImage() {
+        return this.productImageId.isDetailImage();
+    }
 }

@@ -25,4 +25,12 @@ public class ProductImageId implements Serializable {
     @Column(name = "img_div_code")
     @Convert(converter = ProductImageCodeConverter.class)
     private ProductImageCode divCode;
+
+    public boolean isThumbnailImage() {
+        return this.divCode.equals(ProductImageCode.THUMBNAIL_IMAGE);
+    }
+
+    public boolean isDetailImage() {
+        return this.divCode.equals(ProductImageCode.FULL_DETAIL_IMAGE);
+    }
 }
