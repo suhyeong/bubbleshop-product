@@ -13,6 +13,7 @@ public enum ResponseCode {
     SERVER_ERROR("00", "99", "에러가 발생하였습니다. 다시 시도해주세요.", HttpStatus.INTERNAL_SERVER_ERROR),
 
     INVALID_OPTION_TYPE("01", "01", "유효하지 않은 옵션 타입입니다.", HttpStatus.BAD_REQUEST),
+    INVALID_CATEGORY_TYPE("01", "02", "유효하지 않은 카테고리 타입입니다.", HttpStatus.BAD_REQUEST),
 
     ;
 

@@ -22,5 +22,4 @@ public class CreateProductReqDto {
     private List<String> options;
     private String thumbnailImagePath;
     private String detailImagePath;
-    private String saleYn;
 }
