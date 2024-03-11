@@ -28,7 +28,7 @@ public enum SubCategoryCode {
             Stream.of(values()).collect(Collectors.toMap(SubCategoryCode::getCode, Function.identity())));
 
     public static SubCategoryCode find(String value) {
-        if(subCodes.containsKey(value))
+        if(!subCodes.containsKey(value))
             throw new InvalidTypeException(ResponseCode.INVALID_CATEGORY_TYPE);
 
         return subCodes.get(value);

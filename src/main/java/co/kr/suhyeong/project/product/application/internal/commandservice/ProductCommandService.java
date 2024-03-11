@@ -18,7 +18,8 @@ public class ProductCommandService {
 
     @Transactional(rollbackFor = {Exception.class})
     public void createProduct(CreateProductCommand command) {
-        Product product = new Product(command);
+        int count = productRepository.countByMainCategoryCodeAndSubCategoryCode(command.getMainCategoryCode(), command.getSubCategoryCode());
+        Product product = new Product(command, count+1);
         productRepository.save(product);
         this.createProductImage(product, command);
     }

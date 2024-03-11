@@ -56,8 +56,8 @@ public class Product extends TimeEntity implements Serializable {
     @Column(name = "sale_yn")
     private boolean saleYn;
 
-    public Product(CreateProductCommand command) {
-        this.productCode = "02"; // TODO 메인 카테고리, 서브 카테고리, 현재 일자 기준으로 규칙 만들기
+    public Product(CreateProductCommand command, int sequence) {
+        this.productCode = command.getMainCategoryCode().getCode() + command.getSubCategoryCode().getCode() + String.format("%05d", sequence);
         this.productName = command.getName();
         this.mainCategoryCode = command.getMainCategoryCode();
         this.subCategoryCode =  command.getSubCategoryCode();
