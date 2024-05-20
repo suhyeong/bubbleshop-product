@@ -2,6 +2,7 @@ package co.kr.suhyeong.project.product.domain.model.entity;
 
 import co.kr.suhyeong.project.product.domain.constant.ProductImageCode;
 import co.kr.suhyeong.project.product.domain.model.converter.ProductImageCodeConverter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jdk.jfr.Description;
 import lombok.*;
 
@@ -26,10 +27,12 @@ public class ProductImageId implements Serializable {
     @Convert(converter = ProductImageCodeConverter.class)
     private ProductImageCode divCode;
 
+    @JsonIgnore
     public boolean isThumbnailImage() {
         return this.divCode.equals(ProductImageCode.THUMBNAIL_IMAGE);
     }
 
+    @JsonIgnore
     public boolean isDetailImage() {
         return this.divCode.equals(ProductImageCode.FULL_DETAIL_IMAGE);
     }

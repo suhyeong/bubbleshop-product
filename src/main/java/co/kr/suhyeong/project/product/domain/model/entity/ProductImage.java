@@ -2,16 +2,14 @@ package co.kr.suhyeong.project.product.domain.model.entity;
 
 import co.kr.suhyeong.project.product.domain.constant.ProductImageCode;
 import co.kr.suhyeong.project.product.domain.model.aggregate.Product;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jdk.jfr.Description;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "product_img_mng")
@@ -27,6 +25,11 @@ public class ProductImage extends TimeEntity {
     @Column(name = "img_path")
     private String imgPath;
 
+    @ManyToOne
+    @JoinColumn(name = "product_code", insertable = false, updatable = false)
+    @ToString.Exclude
+    private Product product;
+
     public ProductImage(Product product, ProductImageCode imageCode, String imagePath) {
         this.productImageId = new ProductImageId(product.getProductCode(), imageCode);
         this.imgPath = imagePath;
@@ -36,10 +39,12 @@ public class ProductImage extends TimeEntity {
         this.imgPath = changePath;
     }
 
+    @JsonIgnore
     public boolean isThumbnailImage() {
         return this.productImageId.isThumbnailImage();
     }
 
+    @JsonIgnore
     public boolean isDetailImage() {
         return this.productImageId.isDetailImage();
     }

@@ -2,11 +2,14 @@ package co.kr.suhyeong.project.product.domain.model.aggregate;
 
 import co.kr.suhyeong.project.product.domain.command.CreateProductCommand;
 import co.kr.suhyeong.project.product.domain.constant.MainCategoryCode;
+import co.kr.suhyeong.project.product.domain.constant.ProductImageCode;
 import co.kr.suhyeong.project.product.domain.constant.SubCategoryCode;
 import co.kr.suhyeong.project.product.domain.model.converter.MainCategoryCodeConverter;
 import co.kr.suhyeong.project.product.domain.model.converter.SubCategoryCodeConverter;
 import co.kr.suhyeong.project.product.domain.model.converter.YOrNToBooleanConverter;
+import co.kr.suhyeong.project.product.domain.model.entity.ProductImage;
 import co.kr.suhyeong.project.product.domain.model.entity.TimeEntity;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jdk.jfr.Description;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,6 +18,8 @@ import lombok.ToString;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "product_master")
@@ -56,6 +61,10 @@ public class Product extends TimeEntity implements Serializable {
     @Column(name = "sale_yn")
     private boolean saleYn;
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties({"product"})
+    private List<ProductImage> images = new ArrayList<>();
+
     public Product(CreateProductCommand command, int sequence) {
         this.productCode = command.getMainCategoryCode().getCode() + command.getSubCategoryCode().getCode() + String.format("%05d", sequence);
         this.productName = command.getName();
@@ -64,5 +73,13 @@ public class Product extends TimeEntity implements Serializable {
         this.cost = command.getPrice();
         this.discount_rate = 0.0;
         this.saleYn = false;
+        this.createProductImages(command);
+    }
+
+    private void createProductImages(CreateProductCommand command) {
+        if(command.isThumbnailImageExist())
+            images.add(new ProductImage(this, ProductImageCode.THUMBNAIL_IMAGE, command.getThumbnailImagePath()));
+        if(command.isDetailImageExist())
+            images.add(new ProductImage(this, ProductImageCode.FULL_DETAIL_IMAGE, command.getDetailImagePath()));
     }
 }
