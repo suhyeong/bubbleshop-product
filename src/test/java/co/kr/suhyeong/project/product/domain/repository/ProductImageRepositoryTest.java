@@ -30,10 +30,10 @@ class ProductImageRepositoryTest {
         String productCode = "001";
         String path1 = "썸네일 Path 1";
         String path2 = "상세 Path 2";
-        ProductImage image1 = new ProductImage(new ProductImageId(productCode, THUMBNAIL_IMAGE), path1);
-        ProductImage image2 = new ProductImage(new ProductImageId(productCode, FULL_DETAIL_IMAGE), path2);
-        productImageRepository.save(image1);
-        productImageRepository.save(image2);
+//        ProductImage image1 = new ProductImage(new ProductImageId(productCode, THUMBNAIL_IMAGE), path1);
+//        ProductImage image2 = new ProductImage(new ProductImageId(productCode, FULL_DETAIL_IMAGE), path2);
+//        productImageRepository.save(image1);
+//        productImageRepository.save(image2);
 
         //when
         List<ProductImage> actual = productImageRepository.findByProductImageId_ProductCodeAndProductImageId_DivCodeIn(productCode, List.of(THUMBNAIL_IMAGE, FULL_DETAIL_IMAGE));

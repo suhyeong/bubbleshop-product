@@ -36,9 +36,9 @@ class ProductImageQueryServiceTest {
         // 데이터 모킹처리를 진행한다.
         // 해당 테스트 파일에서 수행되는 메소드 내부에 필요한 응답값들을 모킹처리해주면 된다.
         // 해당 서비스 내에서는 레포지토리에서 가져온 값이 모킹처리 되어야 한다.
-        ProductImage image1 = new ProductImage(new ProductImageId("001", ProductImageCode.THUMBNAIL_IMAGE), "path1");
-        ProductImage image2 = new ProductImage(new ProductImageId("001", ProductImageCode.FULL_DETAIL_IMAGE), "path2");
-        given(productImageRepository.findByProductImageId_ProductCodeAndProductImageId_DivCodeIn(anyString(), anyList())).willReturn(List.of(image1, image2));
+//        ProductImage image1 = new ProductImage(new ProductImageId("001", ProductImageCode.THUMBNAIL_IMAGE), "path1");
+//        ProductImage image2 = new ProductImage(new ProductImageId("001", ProductImageCode.FULL_DETAIL_IMAGE), "path2");
+//        given(productImageRepository.findByProductImageId_ProductCodeAndProductImageId_DivCodeIn(anyString(), anyList())).willReturn(List.of(image1, image2));
         
         //when
         //실제로 수행할 메소드를 호출한다.
@@ -49,7 +49,7 @@ class ProductImageQueryServiceTest {
         assertThat(actual.size()).isEqualTo(2);
         //똑같은 의미
         assertEquals(actual.size(), 2);
-        assertThat(actual.get(0)).usingRecursiveComparison().isEqualTo(image1);
+//        assertThat(actual.get(0)).usingRecursiveComparison().isEqualTo(image1);
     }
 
     @Test

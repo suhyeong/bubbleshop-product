@@ -25,7 +25,9 @@ spring:
 
 logging:
   level:
+    org.springframework.web.servlet: debug
     co.kr.suhyeong.project.product.infrastructure.feignclient: debug
+    org.hibernate.type.descriptor.sql.BasicBinder: trace
 
 ---
 # 로컬

@@ -8,6 +8,7 @@ import co.kr.suhyeong.project.product.domain.model.converter.MainCategoryCodeCon
 import co.kr.suhyeong.project.product.domain.model.converter.SubCategoryCodeConverter;
 import co.kr.suhyeong.project.product.domain.model.converter.YOrNToBooleanConverter;
 import co.kr.suhyeong.project.product.domain.model.entity.ProductImage;
+import co.kr.suhyeong.project.product.domain.model.entity.Stock;
 import co.kr.suhyeong.project.product.domain.model.entity.TimeEntity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jdk.jfr.Description;
@@ -59,11 +60,17 @@ public class Product extends TimeEntity implements Serializable {
     @Description("판매 여부")
     @Convert(converter = YOrNToBooleanConverter.class)
     @Column(name = "sale_yn")
-    private boolean saleYn;
+    private boolean isSale;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties({"product"})
     private List<ProductImage> images = new ArrayList<>();
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @MapsId
+    @JoinColumn(name = "product_code", insertable = false, updatable = false)
+    @JsonIgnoreProperties({"product"})
+    private Stock stock;
 
     public Product(CreateProductCommand command, int sequence) {
         this.productCode = command.getMainCategoryCode().getCode() + command.getSubCategoryCode().getCode() + String.format("%05d", sequence);
@@ -72,14 +79,23 @@ public class Product extends TimeEntity implements Serializable {
         this.subCategoryCode =  command.getSubCategoryCode();
         this.cost = command.getPrice();
         this.discount_rate = 0.0;
-        this.saleYn = false;
+        this.isSale = false;
         this.createProductImages(command);
+        this.createProductStock();
     }
 
     private void createProductImages(CreateProductCommand command) {
         if(command.isThumbnailImageExist())
-            images.add(new ProductImage(this, ProductImageCode.THUMBNAIL_IMAGE, command.getThumbnailImagePath()));
+            this.images.add(new ProductImage(this, ProductImageCode.THUMBNAIL_IMAGE, command.getThumbnailImagePath()));
         if(command.isDetailImageExist())
-            images.add(new ProductImage(this, ProductImageCode.FULL_DETAIL_IMAGE, command.getDetailImagePath()));
+            this.images.add(new ProductImage(this, ProductImageCode.FULL_DETAIL_IMAGE, command.getDetailImagePath()));
+    }
+
+    private void createProductStock() {
+        this.stock = new Stock(this);
+    }
+
+    public int getProductStock() {
+        return this.stock.getCount();
     }
 }

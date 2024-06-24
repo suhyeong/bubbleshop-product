@@ -59,8 +59,8 @@ public class ProductController extends BaseController {
     }
 
     @GetMapping(PRODUCT)
-    public ResponseEntity<Object> getProduct(@PathVariable String productId) {
-        Product product = productQueryService.getProduct(productId);
+    public ResponseEntity<ProductView> getProduct(@PathVariable String productId) {
+        ProductView product = productQueryService.getProduct(productId);
         return new ResponseEntity<>(product, getSuccessHeaders(), HttpStatus.OK);
     }
 

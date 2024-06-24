@@ -25,7 +25,7 @@ public class ProductImage extends TimeEntity {
     @Column(name = "img_path")
     private String imgPath;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_code", insertable = false, updatable = false)
     @ToString.Exclude
     private Product product;
@@ -33,6 +33,10 @@ public class ProductImage extends TimeEntity {
     public ProductImage(Product product, ProductImageCode imageCode, String imagePath) {
         this.productImageId = new ProductImageId(product.getProductCode(), imageCode);
         this.imgPath = imagePath;
+    }
+
+    public String getImageDivCode() {
+        return this.productImageId.getDivCode().getCode();
     }
 
     public void modifyProductThumbnailImagePath(String changePath) {
