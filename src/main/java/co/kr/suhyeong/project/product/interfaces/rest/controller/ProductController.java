@@ -5,25 +5,22 @@ import co.kr.suhyeong.project.product.application.internal.queryservice.ProductI
 import co.kr.suhyeong.project.product.application.internal.queryservice.ProductQueryService;
 import co.kr.suhyeong.project.product.domain.command.GetProductImageCommand;
 import co.kr.suhyeong.project.product.domain.command.GetProductListCommand;
-import co.kr.suhyeong.project.product.domain.constant.ProductImageCode;
 import co.kr.suhyeong.project.product.domain.model.aggregate.Product;
 import co.kr.suhyeong.project.product.domain.model.entity.ProductImage;
+import co.kr.suhyeong.project.product.domain.model.view.ProductView;
 import co.kr.suhyeong.project.product.interfaces.rest.dto.CreateProductReqDto;
-import co.kr.suhyeong.project.product.interfaces.rest.dto.EditProductReqDto;
+import co.kr.suhyeong.project.product.interfaces.rest.dto.ModifyProductReqDto;
 import co.kr.suhyeong.project.product.interfaces.rest.dto.GetProductImageRspDto;
-import co.kr.suhyeong.project.product.interfaces.rest.dto.GetProductListRspDto;
 import co.kr.suhyeong.project.product.interfaces.rest.transform.CreateProductCommandDTOAssembler;
 import co.kr.suhyeong.project.product.interfaces.rest.transform.GetProductImageCommandDTOAssembler;
+import co.kr.suhyeong.project.product.interfaces.rest.transform.ModifyProductCommandDTOAssembler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static co.kr.suhyeong.project.product.interfaces.rest.controller.ProductUrl.*;
@@ -40,6 +37,7 @@ public class ProductController extends BaseController {
 
     private final CreateProductCommandDTOAssembler createProductCommandDTOAssembler;
     private final GetProductImageCommandDTOAssembler getProductImageCommandDTOAssembler;
+    private final ModifyProductCommandDTOAssembler modifyProductCommandDTOAssembler;
 
     @PostMapping(PRODUCTS)
     public ResponseEntity<Void> createProduct(@RequestBody @Validated CreateProductReqDto reqDto) {
@@ -50,7 +48,7 @@ public class ProductController extends BaseController {
     @GetMapping(PRODUCTS)
     public ResponseEntity<List<Product>> getProductList(@RequestParam(required = false, defaultValue = "1") Integer page,
                                                @RequestParam(required = false, defaultValue = "0") Integer size) {
-        GetProductListCommand command = GetProductListCommand.builder().pageable(PageRequest.of(page-1, size)).build();
+        GetProductListCommand command = new GetProductListCommand(page, size);
         List<Product> productList = productQueryService.getProductList(command);
 
         return ResponseEntity.ok()
@@ -65,8 +63,8 @@ public class ProductController extends BaseController {
     }
 
     @PutMapping(PRODUCT)
-    public ResponseEntity<Void> editProduct(@PathVariable String productId, @RequestBody EditProductReqDto reqDto) {
-
+    public ResponseEntity<Void> modifyProduct(@PathVariable String productId, @RequestBody ModifyProductReqDto reqDto) {
+        productCommandService.modifyProduct(modifyProductCommandDTOAssembler.toCommand(productId, reqDto));
         return new ResponseEntity<>(null, getSuccessHeaders(), HttpStatus.OK);
     }
 

@@ -1,6 +1,7 @@
 package co.kr.suhyeong.project.product.domain.model.aggregate;
 
 import co.kr.suhyeong.project.product.domain.command.CreateProductCommand;
+import co.kr.suhyeong.project.product.domain.command.ModifyProductCommand;
 import co.kr.suhyeong.project.product.domain.constant.MainCategoryCode;
 import co.kr.suhyeong.project.product.domain.constant.ProductImageCode;
 import co.kr.suhyeong.project.product.domain.constant.SubCategoryCode;
@@ -21,6 +22,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "product_master")
@@ -97,5 +99,21 @@ public class Product extends TimeEntity implements Serializable {
 
     public int getProductStock() {
         return this.stock.getCount();
+    }
+
+    public void modifyProduct(ModifyProductCommand command) {
+        this.productName = command.getName();
+        this.mainCategoryCode = command.getMainCategoryCode();
+        this.subCategoryCode = command.getSubCategoryCode();
+        this.cost = command.getPrice();
+        this.discount_rate = command.getDiscount();
+        this.isSale = command.isSale();
+        this.modifyProductImage(command);
+    }
+
+    private void modifyProductImage(ModifyProductCommand command) {
+        if(Objects.nonNull(this.images) && !this.images.isEmpty()) {
+            this.images.forEach(item -> item.modifyImagePath(command));
+        }
     }
 }

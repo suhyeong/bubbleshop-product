@@ -25,7 +25,7 @@ public class BaseController {
         HttpHeaders headers = new HttpHeaders();
         bindingErrors.forEach(error -> {
             FieldError fieldError = (FieldError) error;
-            headers.add(RESULT_CODE, "0004");
+            headers.add(RESULT_CODE, ResponseCode.NON_EXIST_DATA.getResponseCode());
             headers.add(RESULT_MESSAGE, fieldError.getDefaultMessage());
         });
 

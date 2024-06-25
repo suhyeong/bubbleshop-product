@@ -3,13 +3,13 @@ package co.kr.suhyeong.project.product.domain.command;
 import co.kr.suhyeong.project.product.domain.constant.MainCategoryCode;
 import co.kr.suhyeong.project.product.domain.constant.OptionType;
 import co.kr.suhyeong.project.product.domain.constant.SubCategoryCode;
-import lombok.Builder;
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
 import java.util.Set;
 
 @Getter
-@Builder
+@SuperBuilder
 public class CreateProductCommand {
     private MainCategoryCode mainCategoryCode;
     private SubCategoryCode subCategoryCode;
