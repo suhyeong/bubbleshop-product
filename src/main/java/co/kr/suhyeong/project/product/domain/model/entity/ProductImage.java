@@ -5,10 +5,7 @@ import co.kr.suhyeong.project.product.domain.constant.ProductImageCode;
 import co.kr.suhyeong.project.product.domain.model.aggregate.Product;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jdk.jfr.Description;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -18,6 +15,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Getter
 @ToString
+@Builder
 public class ProductImage extends TimeEntity {
     @EmbeddedId
     private ProductImageId productImageId;

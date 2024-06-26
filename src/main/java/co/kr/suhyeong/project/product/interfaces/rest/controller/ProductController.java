@@ -1,12 +1,11 @@
 package co.kr.suhyeong.project.product.interfaces.rest.controller;
 
 import co.kr.suhyeong.project.product.application.internal.commandservice.ProductCommandService;
-import co.kr.suhyeong.project.product.application.internal.queryservice.ProductImageQueryService;
 import co.kr.suhyeong.project.product.application.internal.queryservice.ProductQueryService;
 import co.kr.suhyeong.project.product.domain.command.GetProductImageCommand;
 import co.kr.suhyeong.project.product.domain.command.GetProductListCommand;
 import co.kr.suhyeong.project.product.domain.model.aggregate.Product;
-import co.kr.suhyeong.project.product.domain.model.entity.ProductImage;
+import co.kr.suhyeong.project.product.domain.model.view.ProductImageView;
 import co.kr.suhyeong.project.product.domain.model.view.ProductView;
 import co.kr.suhyeong.project.product.interfaces.rest.dto.CreateProductReqDto;
 import co.kr.suhyeong.project.product.interfaces.rest.dto.ModifyProductReqDto;
@@ -33,7 +32,6 @@ public class ProductController extends BaseController {
 
     private final ProductCommandService productCommandService;
     private final ProductQueryService productQueryService;
-    private final ProductImageQueryService productImageQueryService;
 
     private final CreateProductCommandDTOAssembler createProductCommandDTOAssembler;
     private final GetProductImageCommandDTOAssembler getProductImageCommandDTOAssembler;
@@ -71,7 +69,7 @@ public class ProductController extends BaseController {
     @GetMapping(PRODUCT_IMAGE)
     public ResponseEntity<GetProductImageRspDto> getProductImageByProductCode(@PathVariable String productId, @RequestParam String divCode) {
         GetProductImageCommand command = getProductImageCommandDTOAssembler.toCommand(productId, divCode);
-        List<ProductImage> list = productImageQueryService.getProductImages(command);
+        List<ProductImageView> list = productQueryService.getProductImages(command);
         GetProductImageRspDto rspDto = getProductImageCommandDTOAssembler.toRspDTO(list, productId);
         return ResponseEntity.ok()
                 .headers(getSuccessHeaders())

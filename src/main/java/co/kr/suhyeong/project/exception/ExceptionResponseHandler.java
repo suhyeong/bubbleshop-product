@@ -40,6 +40,13 @@ public class ExceptionResponseHandler extends ResponseEntityExceptionHandler {
         return headers;
     }
 
+    private HttpHeaders getErrorHeader(ResponseCode responseCode) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(RESULT_CODE, responseCode.getResponseCode());
+        headers.add(RESULT_MESSAGE, URLEncoder.encode(responseCode.getMessage(), StandardCharsets.UTF_8));
+        return headers;
+    }
+
     @Override
     @NonNull
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
@@ -105,6 +112,12 @@ public class ExceptionResponseHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Void> handler(ApiException apiException) {
         log.error("ApiException error code : {}, error message : {}", apiException.getResultCode(), apiException.getResultMessage());
         return new ResponseEntity<>(null, getErrorHeader(apiException.getResultCode(), apiException.getResultMessage()), apiException.getHttpStatus());
+    }
+
+    @ExceptionHandler(Exception.class)
+    protected ResponseEntity<Void> handler(Exception exception) {
+        log.error("Exception error : ", exception.getCause());
+        return new ResponseEntity<>(null, getErrorHeader(ResponseCode.SERVER_ERROR), ResponseCode.SERVER_ERROR.getStatus());
     }
 
 }

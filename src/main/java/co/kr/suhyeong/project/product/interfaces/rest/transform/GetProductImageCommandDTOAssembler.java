@@ -3,6 +3,7 @@ package co.kr.suhyeong.project.product.interfaces.rest.transform;
 import co.kr.suhyeong.project.product.domain.command.GetProductImageCommand;
 import co.kr.suhyeong.project.product.domain.constant.ProductImageCode;
 import co.kr.suhyeong.project.product.domain.model.entity.ProductImage;
+import co.kr.suhyeong.project.product.domain.model.view.ProductImageView;
 import co.kr.suhyeong.project.product.interfaces.rest.dto.GetProductImageDetailRspDto;
 import co.kr.suhyeong.project.product.interfaces.rest.dto.GetProductImageRspDto;
 import org.mapstruct.*;
@@ -32,21 +33,14 @@ public abstract class GetProductImageCommandDTOAssembler {
 
     @Mappings({
             @Mapping(target = "productId", source = "productId"),
-            @Mapping(target = "details", ignore = true)
+            @Mapping(target = "details", source = "productImages", qualifiedByName = "GetProductImageRspDto.List<GetProductImageDetailRspDto>")
     })
-    public abstract GetProductImageRspDto toRspDTO(List<ProductImage> productImages, String productId);
+    public abstract GetProductImageRspDto toRspDTO(List<ProductImageView> productImages, String productId);
 
-    @AfterMapping
-    protected void afterMappingToRspDTO(@MappingTarget GetProductImageRspDto.GetProductImageRspDtoBuilder builder,
-                                        List<ProductImage> productImages, String productId) {
-        List<GetProductImageDetailRspDto> list = new ArrayList<>();
-        productImages.forEach(image -> list.add(toRspDetailDTO(image)));
-        builder.details(list);
-    }
-
+    @Named(value = "GetProductImageRspDto.List<GetProductImageDetailRspDto>")
     @Mappings({
-            @Mapping(target = "divCode", source = "productImage.productImageId.divCode.code"),
-            @Mapping(target = "path", source = "productImage.imgPath")
+            @Mapping(target = "divCode", source = "imageDivCode"),
+            @Mapping(target = "path", source = "imagePath")
     })
-    abstract GetProductImageDetailRspDto toRspDetailDTO(ProductImage productImage);
+    public abstract GetProductImageDetailRspDto toDetailRspDTO(ProductImageView productImage);
 }
