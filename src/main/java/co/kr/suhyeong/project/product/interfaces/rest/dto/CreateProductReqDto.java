@@ -20,6 +20,7 @@ public class CreateProductReqDto {
     private String name;
     private int price;
     private List<String> options;
+    private String defaultOption;
     private String thumbnailImagePath;
     private String detailImagePath;
 }

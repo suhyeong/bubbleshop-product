@@ -9,7 +9,7 @@ import co.kr.suhyeong.project.product.domain.model.converter.MainCategoryCodeCon
 import co.kr.suhyeong.project.product.domain.model.converter.SubCategoryCodeConverter;
 import co.kr.suhyeong.project.product.domain.model.converter.YOrNToBooleanConverter;
 import co.kr.suhyeong.project.product.domain.model.entity.ProductImage;
-import co.kr.suhyeong.project.product.domain.model.entity.Stock;
+import co.kr.suhyeong.project.product.domain.model.entity.ProductOption;
 import co.kr.suhyeong.project.product.domain.model.entity.TimeEntity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jdk.jfr.Description;
@@ -20,6 +20,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "product_master")
@@ -64,13 +66,11 @@ public class Product extends TimeEntity implements Serializable {
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties({"product"})
-    private List<ProductImage> images = new ArrayList<>();
+    private List<ProductImage> images;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @MapsId
-    @JoinColumn(name = "product_code", insertable = false, updatable = false)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties({"product"})
-    private Stock stock;
+    private List<ProductOption> options;
 
     public Product(CreateProductCommand command, int sequence) {
         this.productCode = command.getMainCategoryCode().getCode() + command.getSubCategoryCode().getCode() + String.format("%05d", sequence);
@@ -81,22 +81,25 @@ public class Product extends TimeEntity implements Serializable {
         this.discount_rate = 0.0;
         this.isSale = false;
         this.createProductImages(command);
-        this.createProductStock();
+        this.createProductOptions(command.getOptionName(), command.getDefaultOptionName());
     }
 
     private void createProductImages(CreateProductCommand command) {
+        this.images = new ArrayList<>();
         if(command.isThumbnailImageExist())
             this.images.add(new ProductImage(this, ProductImageCode.THUMBNAIL_IMAGE, command.getThumbnailImagePath()));
         if(command.isDetailImageExist())
             this.images.add(new ProductImage(this, ProductImageCode.FULL_DETAIL_IMAGE, command.getDetailImagePath()));
     }
 
-    private void createProductStock() {
-        this.stock = new Stock(this);
-    }
-
-    public int getProductStock() {
-        return this.stock.getCount();
+    private void createProductOptions(Set<String> productOptions, String defaultOption) {
+        if(!productOptions.isEmpty()) {
+            this.options = new ArrayList<>();
+            productOptions.forEach(option -> {
+                boolean isDefaultOption = defaultOption.equals(option);
+                this.options.add(new ProductOption(this.productCode, this.options.size() + 1, option, isDefaultOption));
+            });
+        }
     }
 
     public void modifyProduct(ModifyProductCommand command) {
@@ -106,12 +109,48 @@ public class Product extends TimeEntity implements Serializable {
         this.cost = command.getPrice();
         this.discount_rate = command.getDiscount();
         this.isSale = command.isSale();
-        this.modifyProductImage(command);
+        this.modifyProductImages(command);
+        this.modifyProductOptions(command.getOptionName(), command.getDefaultOptionName());
     }
 
-    private void modifyProductImage(ModifyProductCommand command) {
+    private void modifyProductImages(ModifyProductCommand command) {
         if(Objects.nonNull(this.images) && !this.images.isEmpty()) {
             this.images.forEach(item -> item.modifyImagePath(command));
         }
+    }
+
+    private boolean isOptionExist() {
+        return Objects.nonNull(this.options) && !this.options.isEmpty();
+    }
+
+    private void modifyProductOptions(Set<String> newProductOptions, String defaultOption) {
+        // 새 옵션 정보가 없을 경우
+        if (newProductOptions.isEmpty()) {
+            //기존 옵션이 존재할 경우만 clear
+            if(this.isOptionExist())
+                this.options.clear();
+        }
+        // 새 옵션 정보가 있을 경우
+        else {
+            // 기존 옵션이 존재할 경우
+            if(this.isOptionExist()) {
+                // 기존 옵션 중 새 옵션에 없는 옵션일 경우 옵션 리스트에서 삭제
+                // TODO 두 옵션 리스트의 교집합 + 새 옵션
+                this.options.removeIf(option -> !newProductOptions.contains(option.getOptionName()));
+                newProductOptions.removeIf(newOption -> this.options.stream().anyMatch(originOption -> originOption.getOptionName().equals(newOption)));
+                newProductOptions.forEach(option -> {
+                    boolean isDefaultOption = defaultOption.equals(option);
+                    this.options.add(new ProductOption(this.productCode, this.options.size() + 1, option, isDefaultOption));
+                });
+            }
+            // 기존 옵션이 존재하지 않을 경우
+            else {
+                this.createProductOptions(newProductOptions, defaultOption);
+            }
+        }
+    }
+
+    public boolean isSameCategory(MainCategoryCode newMainCategory, SubCategoryCode newSubCategory) {
+        return this.mainCategoryCode.equals(newMainCategory) && this.subCategoryCode.equals(newSubCategory);
     }
 }
