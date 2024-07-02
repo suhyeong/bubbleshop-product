@@ -13,10 +13,7 @@ import co.kr.suhyeong.project.product.domain.model.entity.Stock;
 import co.kr.suhyeong.project.product.domain.model.entity.TimeEntity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jdk.jfr.Description;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -30,6 +27,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @ToString
 @Getter
+@Builder
 public class Product extends TimeEntity implements Serializable {
 
     @Id
