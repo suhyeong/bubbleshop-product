@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 public abstract class TimeEntity {
     @Description("생성 일시")
-    @Column(name = "crt_dt")
+    @Column(name = "crt_dt", updatable = false)
     @CreatedDate
     private LocalDateTime createdDate;
 

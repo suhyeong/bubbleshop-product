@@ -46,8 +46,7 @@ public class ProductOption extends TimeEntity {
         this.stock = new Stock();
     }
 
-    public void modifyOption(String optionName, boolean isDefaultOption) {
-        this.optionName = optionName;
+    public void applyDefaultOption(boolean isDefaultOption) {
         this.isDefaultOption = isDefaultOption;
     }
 }

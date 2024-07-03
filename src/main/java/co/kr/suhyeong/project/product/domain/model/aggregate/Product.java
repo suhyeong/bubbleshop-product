@@ -17,11 +17,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Entity
 @Table(name = "product_master")
@@ -70,7 +66,7 @@ public class Product extends TimeEntity implements Serializable {
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties({"product"})
-    private List<ProductOption> options;
+    private List<ProductOption> options = new ArrayList<>();
 
     public Product(CreateProductCommand command, int sequence) {
         this.productCode = command.getMainCategoryCode().getCode() + command.getSubCategoryCode().getCode() + String.format("%05d", sequence);
@@ -94,7 +90,6 @@ public class Product extends TimeEntity implements Serializable {
 
     private void createProductOptions(Set<String> productOptions, String defaultOption) {
         if(!productOptions.isEmpty()) {
-            this.options = new ArrayList<>();
             productOptions.forEach(option -> {
                 boolean isDefaultOption = defaultOption.equals(option);
                 this.options.add(new ProductOption(this.productCode, this.options.size() + 1, option, isDefaultOption));
@@ -125,7 +120,7 @@ public class Product extends TimeEntity implements Serializable {
 
     private void modifyProductOptions(Set<String> newProductOptions, String defaultOption) {
         // 새 옵션 정보가 없을 경우
-        if (newProductOptions.isEmpty()) {
+        if (Objects.isNull(newProductOptions) || newProductOptions.isEmpty()) {
             //기존 옵션이 존재할 경우만 clear
             if(this.isOptionExist())
                 this.options.clear();
@@ -135,12 +130,16 @@ public class Product extends TimeEntity implements Serializable {
             // 기존 옵션이 존재할 경우
             if(this.isOptionExist()) {
                 // 기존 옵션 중 새 옵션에 없는 옵션일 경우 옵션 리스트에서 삭제
-                // TODO 두 옵션 리스트의 교집합 + 새 옵션
                 this.options.removeIf(option -> !newProductOptions.contains(option.getOptionName()));
-                newProductOptions.removeIf(newOption -> this.options.stream().anyMatch(originOption -> originOption.getOptionName().equals(newOption)));
+
                 newProductOptions.forEach(option -> {
                     boolean isDefaultOption = defaultOption.equals(option);
-                    this.options.add(new ProductOption(this.productCode, this.options.size() + 1, option, isDefaultOption));
+
+                    //기존에 이미 존재하는 옵션이면 디폴트 여부만 수정, 존재하지 않다면 새 옵션 추가
+                    this.options.stream().filter(originOption -> originOption.getOptionName().equals(option)).findAny()
+                            .ifPresentOrElse(
+                                    sameOption -> sameOption.applyDefaultOption(isDefaultOption),
+                                    () -> this.options.add(new ProductOption(this.productCode, this.options.size() + 1, option, isDefaultOption)));
                 });
             }
             // 기존 옵션이 존재하지 않을 경우

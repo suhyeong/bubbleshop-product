@@ -35,14 +35,17 @@ public class ProductCommandService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void modifyProduct(ModifyProductCommand command) {
-        Product product = productRepository.findByProductCode(command.getProductCode())
+        Product originProduct = productRepository.findByProductCode(command.getProductCode())
                 .orElseThrow(() -> new ApiException(NON_EXIST_DATA));
-        if(product.isSameCategory(command.getMainCategoryCode(), command.getSubCategoryCode())) {
-            product.modifyProduct(command);
+        if(originProduct.isSameCategory(command.getMainCategoryCode(), command.getSubCategoryCode())) {
+            originProduct.modifyProduct(command);
+            productRepository.save(originProduct);
         } else {
             int count = productRepository.countByMainCategoryCodeAndSubCategoryCode(command.getMainCategoryCode(), command.getSubCategoryCode());
-            product = new Product(command, count+1);
+            Product newProduct = new Product(command, count+1);
+
+            productRepository.delete(originProduct);
+            productRepository.save(newProduct);
         }
-        productRepository.save(product);
     }
 }
