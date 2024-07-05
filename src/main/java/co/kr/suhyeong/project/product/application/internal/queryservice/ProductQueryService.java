@@ -7,7 +7,6 @@ import co.kr.suhyeong.project.product.domain.model.aggregate.Product;
 import co.kr.suhyeong.project.product.domain.model.view.ProductImageView;
 import co.kr.suhyeong.project.product.domain.model.view.ProductView;
 import co.kr.suhyeong.project.product.domain.repository.ProductRepository;
-import co.kr.suhyeong.project.product.domain.repository.ProductStockRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,7 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static co.kr.suhyeong.project.constants.ResponseCode.*;
+import static co.kr.suhyeong.project.constants.ResponseCode.NON_EXIST_DATA;
+import static co.kr.suhyeong.project.constants.ResponseCode.SERVER_ERROR;
 
 @Service
 @Slf4j
@@ -24,7 +24,6 @@ import static co.kr.suhyeong.project.constants.ResponseCode.*;
 @Transactional(readOnly = true)
 public class ProductQueryService {
     private final ProductRepository productRepository;
-    private final ProductStockRepository productStockRepository;
 
     public ProductView getProduct(String productCode) {
         Product product = productRepository.findByProductCode(productCode)
