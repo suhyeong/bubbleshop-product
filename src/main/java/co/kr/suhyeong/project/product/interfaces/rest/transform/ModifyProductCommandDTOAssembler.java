@@ -17,7 +17,8 @@ import static co.kr.suhyeong.project.constants.StaticValues.COMMON_Y;
 public abstract class ModifyProductCommandDTOAssembler {
 
     @Mappings({
-            @Mapping(target = "options", ignore = true),
+            @Mapping(target = "optionName", ignore = true),
+            @Mapping(target = "defaultOptionName", source = "reqDto.defaultOption"),
             @Mapping(target = "mainCategoryCode", ignore = true),
             @Mapping(target = "subCategoryCode", ignore = true),
             @Mapping(target = "isSale", ignore = true)
@@ -31,7 +32,8 @@ public abstract class ModifyProductCommandDTOAssembler {
     ) {
         builder.mainCategoryCode(MainCategoryCode.find(reqDto.getMainCategoryCode()));
         builder.subCategoryCode(SubCategoryCode.find(reqDto.getSubCategoryCode()));
-        builder.options(this.getOptionTypeList(reqDto.getOptions()));
+        if(!reqDto.getOptions().isEmpty())
+            builder.optionName(new HashSet<>(reqDto.getOptions()));
         builder.isSale(this.getSaleBoolean(reqDto.getSaleYn()));
     }
 

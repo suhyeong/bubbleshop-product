@@ -1,9 +1,7 @@
 package co.kr.suhyeong.project.product.domain.model.entity;
 
 import jdk.jfr.Description;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -12,6 +10,8 @@ import java.io.Serializable;
 @Embeddable
 @EqualsAndHashCode
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
 @ToString
 public class ProductOptionId implements Serializable {
     @Description("상품 코드")
