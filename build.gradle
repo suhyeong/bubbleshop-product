@@ -20,6 +20,7 @@ ext {
 	lombokMapstructBindVersion = '0.2.0'
 	querydslVersion = '5.0.0'
 	springCloudVersion = '2021.0.3'
+	openApiVersion = '1.8.0'
 }
 
 dependencies {
@@ -82,6 +83,9 @@ dependencies {
 	implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j'
 
 	testImplementation 'org.springframework.cloud:spring-cloud-contract-wiremock'
+
+	//open api
+	implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: openApiVersion
 }
 
 dependencyManagement {
