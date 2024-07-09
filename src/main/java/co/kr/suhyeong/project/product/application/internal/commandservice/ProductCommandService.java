@@ -41,11 +41,8 @@ public class ProductCommandService {
             originProduct.modifyProduct(command);
             productRepository.save(originProduct);
         } else {
-            int count = productRepository.countByMainCategoryCodeAndSubCategoryCode(command.getMainCategoryCode(), command.getSubCategoryCode());
-            Product newProduct = new Product(command, count+1);
-
+            this.createProduct(command);
             productRepository.delete(originProduct);
-            productRepository.save(newProduct);
         }
     }
 }

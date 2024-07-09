@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
 @ToString
 public class ProductView {
     private String productCode;

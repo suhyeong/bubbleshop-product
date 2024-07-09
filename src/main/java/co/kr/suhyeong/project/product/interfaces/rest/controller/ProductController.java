@@ -20,6 +20,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -92,6 +93,17 @@ public class ProductController extends BaseController {
         return ResponseEntity.ok()
                 .headers(getSuccessHeaders())
                 .body(rspDto);
+    }
+
+    private final RedisTemplate<String, Object> redisTemplate;
+
+    @GetMapping("/redis/test")
+    public ResponseEntity<Object> getRedisTest(@RequestParam(name = "key") String key, @RequestParam(name = "type") String type, @RequestParam(name = "value", required = false) String setValue) {
+        if(type.equals("set")) {
+            redisTemplate.opsForValue().set(key, setValue);
+        }
+        Object value = redisTemplate.opsForValue().get(key);
+        return ResponseEntity.ok().body(value);
     }
 
 }
