@@ -7,7 +7,6 @@ import co.kr.suhyeong.project.product.domain.command.GetProductListCommand;
 import co.kr.suhyeong.project.product.domain.model.aggregate.Product;
 import co.kr.suhyeong.project.product.domain.model.view.ProductImageView;
 import co.kr.suhyeong.project.product.domain.model.view.ProductView;
-import co.kr.suhyeong.project.product.domain.service.MemberRepository;
 import co.kr.suhyeong.project.product.interfaces.rest.dto.CreateProductReqDto;
 import co.kr.suhyeong.project.product.interfaces.rest.dto.ModifyProductReqDto;
 import co.kr.suhyeong.project.product.interfaces.rest.dto.GetProductImageRspDto;
@@ -44,8 +43,6 @@ public class ProductController extends BaseController {
     private final CreateProductCommandDTOAssembler createProductCommandDTOAssembler;
     private final GetProductImageCommandDTOAssembler getProductImageCommandDTOAssembler;
     private final ModifyProductCommandDTOAssembler modifyProductCommandDTOAssembler;
-
-    private final MemberRepository memberRepository;
 
     @Operation(summary = "상품 생성 API", description = "새로운 상품을 생성한다.")
     @ApiResponses(value = {
@@ -96,24 +93,6 @@ public class ProductController extends BaseController {
         return ResponseEntity.ok()
                 .headers(getSuccessHeaders())
                 .body(rspDto);
-    }
-
-    private final RedisTemplate<String, Object> redisTemplate;
-
-    @GetMapping("/redis/test")
-    public ResponseEntity<Object> getRedisTest(@RequestParam(name = "key") String key, @RequestParam(name = "type") String type, @RequestParam(name = "value", required = false) String setValue) {
-        if(type.equals("set")) {
-            redisTemplate.opsForValue().set(key, setValue);
-        }
-        Object value = redisTemplate.opsForValue().get(key);
-        return ResponseEntity.ok().body(value);
-    }
-
-    @GetMapping("/member")
-    public ResponseEntity<Void> getMembers() {
-        // SpringQueryMap 테스트를 위한 호출 Controller
-        memberRepository.getMembers();
-        return ResponseEntity.ok().build();
     }
 
 }
