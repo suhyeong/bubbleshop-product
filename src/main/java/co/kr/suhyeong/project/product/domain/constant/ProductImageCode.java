@@ -28,8 +28,4 @@ public enum ProductImageCode {
     public static ProductImageCode find(String code) {
         return codes.getOrDefault(code, null);
     }
-
-//    public static ProductImageCode find(String code) {
-//        return null;
-//    }
 }

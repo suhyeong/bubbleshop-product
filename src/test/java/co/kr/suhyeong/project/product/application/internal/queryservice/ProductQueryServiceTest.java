@@ -50,9 +50,9 @@ class ProductQueryServiceTest {
                 .imgPath("path2")
                 .build();
 
-        Product product = ProductMockData.createProduct(List.of(image1, image2));
+        Product product = ProductMockData.createProduct("001", List.of(image1, image2));
 
-        given(productRepository.findByProductCode(any())).willReturn(Optional.of(product));
+        given(productRepository.findById(any())).willReturn(Optional.of(product));
 
         //when
         //실제로 수행할 메소드를 호출한다.
@@ -73,7 +73,7 @@ class ProductQueryServiceTest {
     @DisplayName("DB 조회시 DB 에서 알 수 없는 에러가 발생한다.")
     void getProductImages_db_error() {
         //given
-        given(productRepository.findByProductCode(any()))
+        given(productRepository.findById(any()))
                 .willThrow(new MockitoException("DB 에러가 났다고 가정해볼까요?"));
 
         //when, then
