@@ -31,12 +31,11 @@ public class ProductQueryService {
     public ProductView getProduct(String productCode) {
         Product product = productRepository.findById(productCode)
                 .orElseThrow(() -> new ApiException(NON_EXIST_DATA));
-        ProductView view = new ProductView(product);
-        return view;
+        return new ProductView(product);
     }
 
-    public List<Product> getProductList(GetProductListCommand command) {
-            return productRepository.findProductListWithPagination(command.getPageable());
+    public List<ProductView> getProductList(GetProductListCommand command) {
+        return productRepository.findProductListWithPagination(command);
     }
 
     public List<ProductImageView> getProductImages(GetProductImageCommand command) {

@@ -26,7 +26,7 @@ public class CategoryController extends BaseController {
 
     @GetMapping(CATEGORIES)
     public ResponseEntity<Object> getCategories(@RequestParam(required = false, defaultValue = "1") Integer page,
-                                                @RequestParam(required = false, defaultValue = "0") Integer size,
+                                                @RequestParam(required = false, defaultValue = "1") Integer size,
                                                 @RequestParam String pagingYn,
                                                 @RequestParam(required = false, defaultValue = "") String categoryType,
                                                 @RequestParam(required = false, defaultValue = "") String categoryCode) {
