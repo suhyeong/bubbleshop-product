@@ -4,6 +4,7 @@ import co.kr.suhyeong.project.exception.ApiException;
 import co.kr.suhyeong.project.product.domain.command.CreateProductCommand;
 import co.kr.suhyeong.project.product.domain.command.ModifyProductCommand;
 import co.kr.suhyeong.project.product.domain.model.aggregate.Product;
+import co.kr.suhyeong.project.product.domain.repository.CategoryRepository;
 import co.kr.suhyeong.project.product.domain.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,9 +18,16 @@ import static co.kr.suhyeong.project.constants.ResponseCode.NON_EXIST_DATA;
 @RequiredArgsConstructor
 public class ProductCommandService {
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
+
+    private void checkCategory(String mainCategoryCode, String subCategoryCode) {
+        if(!categoryRepository.existsById(mainCategoryCode) || !categoryRepository.existsById(subCategoryCode))
+            throw new ApiException(NON_EXIST_DATA);
+    }
 
     @Transactional(rollbackFor = Exception.class)
     public void createProduct(CreateProductCommand command) {
+        this.checkCategory(command.getMainCategoryCode(), command.getSubCategoryCode());
         int count = productRepository.countByMainCategoryCodeAndSubCategoryCode(command.getMainCategoryCode(), command.getSubCategoryCode());
         Product product = new Product(command, count+1);
         productRepository.save(product);
@@ -35,7 +43,7 @@ public class ProductCommandService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void modifyProduct(ModifyProductCommand command) {
-        Product originProduct = productRepository.findByProductCode(command.getProductCode())
+        Product originProduct = productRepository.findById(command.getProductCode())
                 .orElseThrow(() -> new ApiException(NON_EXIST_DATA));
         if(originProduct.isSameCategory(command.getMainCategoryCode(), command.getSubCategoryCode())) {
             originProduct.modifyProduct(command);

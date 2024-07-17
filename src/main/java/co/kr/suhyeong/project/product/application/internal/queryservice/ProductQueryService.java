@@ -29,22 +29,18 @@ public class ProductQueryService {
 
     @Cacheable(cacheNames = StaticValues.RedisKey.PRODUCT_KEY, key = "#productCode")
     public ProductView getProduct(String productCode) {
-        Product product = productRepository.findByProductCode(productCode)
+        Product product = productRepository.findById(productCode)
                 .orElseThrow(() -> new ApiException(NON_EXIST_DATA));
         ProductView view = new ProductView(product);
         return view;
     }
 
     public List<Product> getProductList(GetProductListCommand command) {
-        try {
             return productRepository.findProductListWithPagination(command.getPageable());
-        } catch (Exception e) {
-            throw new ApiException(SERVER_ERROR);
-        }
     }
 
     public List<ProductImageView> getProductImages(GetProductImageCommand command) {
-        Product product = productRepository.findByProductCode(command.getProductCode())
+        Product product = productRepository.findById(command.getProductCode())
                 .orElseThrow(() -> new ApiException(NON_EXIST_DATA));
 
         return product.getImages().stream()
