@@ -1,5 +1,6 @@
 package co.kr.suhyeong.project.product.application.internal.queryservice;
 
+import co.kr.suhyeong.project.constants.StaticValues;
 import co.kr.suhyeong.project.exception.ApiException;
 import co.kr.suhyeong.project.product.domain.command.GetProductImageCommand;
 import co.kr.suhyeong.project.product.domain.command.GetProductListCommand;
@@ -9,7 +10,7 @@ import co.kr.suhyeong.project.product.domain.model.view.ProductView;
 import co.kr.suhyeong.project.product.domain.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,14 +26,12 @@ import static co.kr.suhyeong.project.constants.ResponseCode.SERVER_ERROR;
 @Transactional(readOnly = true)
 public class ProductQueryService {
     private final ProductRepository productRepository;
-    private final RedisTemplate<String, Object> redisTemplate;
 
-
+    @Cacheable(cacheNames = StaticValues.RedisKey.PRODUCT_KEY, key = "#productCode")
     public ProductView getProduct(String productCode) {
         Product product = productRepository.findByProductCode(productCode)
                 .orElseThrow(() -> new ApiException(NON_EXIST_DATA));
         ProductView view = new ProductView(product);
-        redisTemplate.opsForValue().set("prd|".concat(productCode), view);
         return view;
     }
 

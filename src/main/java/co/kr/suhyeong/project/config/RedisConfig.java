@@ -1,5 +1,6 @@
 package co.kr.suhyeong.project.config;
 
+import co.kr.suhyeong.project.constants.StaticValues;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,15 +9,24 @@ import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisPassword;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 @RequiredArgsConstructor
@@ -58,5 +68,27 @@ public class RedisConfig {
         PolymorphicTypeValidator validator = BasicPolymorphicTypeValidator.builder().allowIfSubType(Object.class).build();
         objectMapper.activateDefaultTyping(validator, ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
         return new GenericJackson2JsonRedisSerializer(objectMapper);
+    }
+
+    @Bean
+    public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
+        RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofSeconds(StaticValues.RedisKey.REDIS_DEFAULT_EXPIRE_SEC)) // 기본 10분
+                .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
+                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(jackson2JsonRedisSerializerCustomMapper()))
+                .disableCachingNullValues();
+
+        // RedisKey, CacheConfiguration 설정을 담을 Map 생성
+        Map<String, RedisCacheConfiguration> redisCacheConfigurationMap = new HashMap<>();
+        redisCacheConfigurationMap.put(StaticValues.RedisKey.PRODUCT_KEY,
+                redisCacheConfiguration.entryTtl(Duration.ofSeconds(60L))); // prd 60초
+        redisCacheConfigurationMap.put(StaticValues.RedisKey.CATEGORY_KEY,
+                redisCacheConfiguration.entryTtl(Duration.ofSeconds(120))); // cate 120초
+
+        return RedisCacheManager.RedisCacheManagerBuilder
+                .fromConnectionFactory(redisConnectionFactory)
+                .cacheDefaults(redisCacheConfiguration)
+                .withInitialCacheConfigurations(redisCacheConfigurationMap)
+                .build();
     }
 }
