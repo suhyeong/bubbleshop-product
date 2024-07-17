@@ -2,11 +2,7 @@ package co.kr.suhyeong.project.product.domain.model.aggregate;
 
 import co.kr.suhyeong.project.product.domain.command.CreateProductCommand;
 import co.kr.suhyeong.project.product.domain.command.ModifyProductCommand;
-import co.kr.suhyeong.project.product.domain.constant.MainCategoryCode;
 import co.kr.suhyeong.project.product.domain.constant.ProductImageCode;
-import co.kr.suhyeong.project.product.domain.constant.SubCategoryCode;
-import co.kr.suhyeong.project.product.domain.model.converter.MainCategoryCodeConverter;
-import co.kr.suhyeong.project.product.domain.model.converter.SubCategoryCodeConverter;
 import co.kr.suhyeong.project.product.domain.model.converter.YOrNToBooleanConverter;
 import co.kr.suhyeong.project.product.domain.model.entity.ProductImage;
 import co.kr.suhyeong.project.product.domain.model.entity.ProductOption;
@@ -17,7 +13,10 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "product_master")
@@ -39,13 +38,11 @@ public class Product extends TimeEntity implements Serializable {
 
     @Description("상품 메인 카테고리 코드")
     @Column(name = "main_cate_code")
-    @Convert(converter = MainCategoryCodeConverter.class)
-    private MainCategoryCode mainCategoryCode;
+    private String mainCategoryCode;
 
     @Description("상품 서브 카테고리 코드")
     @Column(name = "sub_cate_code")
-    @Convert(converter = SubCategoryCodeConverter.class)
-    private SubCategoryCode subCategoryCode;
+    private String subCategoryCode;
 
     @Description("상품 원가")
     @Column(name = "cost")
@@ -69,10 +66,10 @@ public class Product extends TimeEntity implements Serializable {
     private List<ProductOption> options = new ArrayList<>();
 
     public Product(CreateProductCommand command, int sequence) {
-        this.productCode = command.getMainCategoryCode().getCode() + command.getSubCategoryCode().getCode() + String.format("%05d", sequence);
+        this.productCode = command.getMainCategoryCode() + command.getSubCategoryCode() + String.format("%05d", sequence);
         this.productName = command.getName();
         this.mainCategoryCode = command.getMainCategoryCode();
-        this.subCategoryCode =  command.getSubCategoryCode();
+        this.subCategoryCode = command.getSubCategoryCode();
         this.cost = command.getPrice();
         this.discount_rate = 0.0;
         this.isSale = false;
@@ -99,8 +96,6 @@ public class Product extends TimeEntity implements Serializable {
 
     public void modifyProduct(ModifyProductCommand command) {
         this.productName = command.getName();
-        this.mainCategoryCode = command.getMainCategoryCode();
-        this.subCategoryCode = command.getSubCategoryCode();
         this.cost = command.getPrice();
         this.discount_rate = command.getDiscount();
         this.isSale = command.isSale();
@@ -149,7 +144,7 @@ public class Product extends TimeEntity implements Serializable {
         }
     }
 
-    public boolean isSameCategory(MainCategoryCode newMainCategory, SubCategoryCode newSubCategory) {
-        return this.mainCategoryCode.equals(newMainCategory) && this.subCategoryCode.equals(newSubCategory);
+    public boolean isSameCategory(String newMainCategoryCode, String newSubCategoryCode) {
+        return this.mainCategoryCode.equals(newMainCategoryCode) && this.subCategoryCode.equals(newSubCategoryCode);
     }
 }

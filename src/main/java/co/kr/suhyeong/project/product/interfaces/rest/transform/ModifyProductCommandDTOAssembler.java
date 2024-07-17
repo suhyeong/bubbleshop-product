@@ -1,9 +1,7 @@
 package co.kr.suhyeong.project.product.interfaces.rest.transform;
 
 import co.kr.suhyeong.project.product.domain.command.ModifyProductCommand;
-import co.kr.suhyeong.project.product.domain.constant.MainCategoryCode;
 import co.kr.suhyeong.project.product.domain.constant.OptionType;
-import co.kr.suhyeong.project.product.domain.constant.SubCategoryCode;
 import co.kr.suhyeong.project.product.interfaces.rest.dto.ModifyProductReqDto;
 import org.mapstruct.*;
 
@@ -19,8 +17,6 @@ public abstract class ModifyProductCommandDTOAssembler {
     @Mappings({
             @Mapping(target = "optionName", ignore = true),
             @Mapping(target = "defaultOptionName", source = "reqDto.defaultOption"),
-            @Mapping(target = "mainCategoryCode", ignore = true),
-            @Mapping(target = "subCategoryCode", ignore = true),
             @Mapping(target = "isSale", ignore = true)
     })
     public abstract ModifyProductCommand toCommand(String productCode, ModifyProductReqDto reqDto);
@@ -30,8 +26,6 @@ public abstract class ModifyProductCommandDTOAssembler {
             @MappingTarget ModifyProductCommand.ModifyProductCommandBuilder<?,?> builder,
             ModifyProductReqDto reqDto
     ) {
-        builder.mainCategoryCode(MainCategoryCode.find(reqDto.getMainCategoryCode()));
-        builder.subCategoryCode(SubCategoryCode.find(reqDto.getSubCategoryCode()));
         if(!reqDto.getOptions().isEmpty())
             builder.optionName(new HashSet<>(reqDto.getOptions()));
         builder.isSale(this.getSaleBoolean(reqDto.getSaleYn()));

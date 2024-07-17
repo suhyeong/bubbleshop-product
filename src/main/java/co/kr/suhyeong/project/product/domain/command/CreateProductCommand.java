@@ -1,7 +1,5 @@
 package co.kr.suhyeong.project.product.domain.command;
 
-import co.kr.suhyeong.project.product.domain.constant.MainCategoryCode;
-import co.kr.suhyeong.project.product.domain.constant.SubCategoryCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -12,8 +10,8 @@ import java.util.Set;
 @NoArgsConstructor
 @SuperBuilder
 public class CreateProductCommand {
-    private MainCategoryCode mainCategoryCode;
-    private SubCategoryCode subCategoryCode;
+    private String mainCategoryCode;
+    private String subCategoryCode;
     private String name;
     private int price;
     private Set<String> optionName;
