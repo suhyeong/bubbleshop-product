@@ -78,17 +78,9 @@ public class RedisConfig {
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(jackson2JsonRedisSerializerCustomMapper()))
                 .disableCachingNullValues();
 
-        // RedisKey, CacheConfiguration 설정을 담을 Map 생성
-        Map<String, RedisCacheConfiguration> redisCacheConfigurationMap = new HashMap<>();
-        redisCacheConfigurationMap.put(StaticValues.RedisKey.PRODUCT_KEY,
-                redisCacheConfiguration.entryTtl(Duration.ofSeconds(60L))); // prd 60초
-        redisCacheConfigurationMap.put(StaticValues.RedisKey.CATEGORY_KEY,
-                redisCacheConfiguration.entryTtl(Duration.ofSeconds(120))); // cate 120초
-
         return RedisCacheManager.RedisCacheManagerBuilder
                 .fromConnectionFactory(redisConnectionFactory)
                 .cacheDefaults(redisCacheConfiguration)
-                .withInitialCacheConfigurations(redisCacheConfigurationMap)
                 .build();
     }
 }

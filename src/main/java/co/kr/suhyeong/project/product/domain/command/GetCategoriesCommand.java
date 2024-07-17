@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Objects;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -20,5 +22,9 @@ public class GetCategoriesCommand {
 
     public boolean isCategoryCodeExist() {
         return StringUtils.isNotBlank(categoryCode);
+    }
+
+    public boolean isCategoryTypeExist() {
+        return Objects.nonNull(categoryType);
     }
 }
