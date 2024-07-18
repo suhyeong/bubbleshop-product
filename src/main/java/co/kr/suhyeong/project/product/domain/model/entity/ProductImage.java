@@ -8,6 +8,7 @@ import jdk.jfr.Description;
 import lombok.*;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "product_img_mng")
@@ -16,7 +17,7 @@ import javax.persistence.*;
 @Getter
 @ToString
 @Builder
-public class ProductImage extends TimeEntity {
+public class ProductImage extends TimeEntity implements Serializable {
     @EmbeddedId
     private ProductImageId productImageId;
 

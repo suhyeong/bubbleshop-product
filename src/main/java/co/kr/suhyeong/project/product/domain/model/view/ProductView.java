@@ -1,6 +1,7 @@
 package co.kr.suhyeong.project.product.domain.model.view;
 
 import co.kr.suhyeong.project.product.domain.model.aggregate.Product;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@AllArgsConstructor
 @NoArgsConstructor
 @ToString
 public class ProductView {

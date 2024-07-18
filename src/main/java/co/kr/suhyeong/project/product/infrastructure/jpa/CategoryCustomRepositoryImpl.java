@@ -28,19 +28,19 @@ public class CategoryCustomRepositoryImpl extends QuerydslRepositorySupport impl
         if(command.isNeedToPaging()) {
             return jpaQueryFactory
                     .selectFrom(category)
-                    .where(this.whereCategoryType(command.getCategoryType()))
+                    .where(this.whereCategoryType(command.isCategoryTypeExist(), command.getCategoryType()))
                     .offset(command.getPaging().getOffset())
                     .limit(command.getPaging().getPageSize())
                     .fetch();
         }
         else return jpaQueryFactory
                 .selectFrom(category)
-                .where(this.whereCategoryType(command.getCategoryType()))
+                .where(this.whereCategoryType(command.isCategoryTypeExist(), command.getCategoryType()))
                 .fetch();
     }
 
-    private Predicate whereCategoryType(CategoryType categoryType) {
-        return Objects.isNull(categoryType) ? null : category.categoryType.eq(categoryType);
+    private Predicate whereCategoryType(boolean isCategoryTypeExist, CategoryType categoryType) {
+        return isCategoryTypeExist ? category.categoryType.eq(categoryType) : null;
     }
 
     @Override

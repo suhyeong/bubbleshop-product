@@ -1,13 +1,11 @@
 package co.kr.suhyeong.project.product.domain.model.view;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 
 @Getter
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 @ToString
 public class ProductImageView {
     private String imageDivCode;

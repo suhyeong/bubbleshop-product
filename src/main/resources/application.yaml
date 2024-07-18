@@ -22,10 +22,15 @@ spring:
       on-profile: common-config
   flyway:
     enabled: false
+  redis:
+    host: localhost
+    port: 6379
+    password:
 
 logging:
   level:
     org.springframework.web.servlet: debug
+    #org.springframework.boot.autoconfigure: debug
     co.kr.suhyeong.project.product.infrastructure.feignclient: debug
     org.hibernate.type.descriptor.sql.BasicBinder: trace
 
