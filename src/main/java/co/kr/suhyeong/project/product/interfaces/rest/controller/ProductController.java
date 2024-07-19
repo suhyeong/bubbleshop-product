@@ -68,11 +68,11 @@ public class ProductController extends BaseController {
                                                         @RequestParam(required = false) String mainCategoryCode,
                                                         @RequestParam(required = false) String subCategoryCode) {
         GetProductListCommand command = getProductListCommandDTOAssembler.toCommand(page, size, productCode, productName, isProductNameContains, mainCategoryCode, subCategoryCode);
-        List<ProductView> productList = productQueryService.getProductList(command);
-
+        ProductListView productListView = productQueryService.getProductList(command);
+        GetProductListRspDto rspDto = getProductListCommandDTOAssembler.toRspDto(productListView);
         return ResponseEntity.ok()
                 .headers(getSuccessHeaders())
-                .body(productList);
+                .body(rspDto);
     }
 
     @Operation(summary = "단건 상품 조회 API", description = "상품 코드로 상품 정보를 조회한다.")

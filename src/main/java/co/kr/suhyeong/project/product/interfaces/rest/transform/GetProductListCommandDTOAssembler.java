@@ -1,6 +1,8 @@
 package co.kr.suhyeong.project.product.interfaces.rest.transform;
 
 import co.kr.suhyeong.project.product.domain.command.GetProductListCommand;
+import co.kr.suhyeong.project.product.domain.model.view.ProductListView;
+import co.kr.suhyeong.project.product.interfaces.rest.dto.GetProductListRspDto;
 import org.mapstruct.*;
 import org.springframework.data.domain.PageRequest;
 
@@ -22,4 +24,9 @@ public abstract class GetProductListCommandDTOAssembler {
                                          String mainCategoryCode, String subCategoryCode) {
         builder.pageable(PageRequest.of(page-1, size));
     }
+
+    @Mappings({
+            @Mapping(target = "totalCount", source = "productListView.count")
+    })
+    public abstract GetProductListRspDto toRspDto(ProductListView productListView);
 }

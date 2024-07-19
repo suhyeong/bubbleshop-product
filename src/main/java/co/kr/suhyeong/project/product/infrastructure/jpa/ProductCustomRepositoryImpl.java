@@ -23,6 +23,20 @@ public class ProductCustomRepositoryImpl extends QuerydslRepositorySupport imple
     }
 
     @Override
+    public long countByProductListWithPagination(GetProductListCommand command) {
+        QCategory mainCategory = new QCategory("mainCategory");
+        QCategory subCategory = new QCategory("subCategory");
+
+        return jpaQueryFactory
+                .select(product.productCode)
+                .from(product)
+                .join(mainCategory).on(product.mainCategoryCode.eq(mainCategory.code))
+                .join(subCategory).on(product.subCategoryCode.eq(subCategory.code))
+                .where(this.whereProductList(command))
+                .fetch().size();
+    }
+
+    @Override
     public List<ProductView> findProductListWithPagination(GetProductListCommand command) {
         QCategory mainCategory = new QCategory("mainCategory");
         QCategory subCategory = new QCategory("subCategory");
