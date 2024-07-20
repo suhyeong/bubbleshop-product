@@ -5,8 +5,10 @@ import co.kr.suhyeong.project.product.application.internal.queryservice.ProductQ
 import co.kr.suhyeong.project.product.domain.command.GetProductImageCommand;
 import co.kr.suhyeong.project.product.domain.command.GetProductListCommand;
 import co.kr.suhyeong.project.product.domain.model.view.ProductImageView;
+import co.kr.suhyeong.project.product.domain.model.view.ProductListView;
 import co.kr.suhyeong.project.product.domain.model.view.ProductView;
 import co.kr.suhyeong.project.product.interfaces.rest.dto.CreateProductReqDto;
+import co.kr.suhyeong.project.product.interfaces.rest.dto.GetProductListRspDto;
 import co.kr.suhyeong.project.product.interfaces.rest.dto.ModifyProductReqDto;
 import co.kr.suhyeong.project.product.interfaces.rest.dto.GetProductImageRspDto;
 import co.kr.suhyeong.project.product.interfaces.rest.transform.CreateProductCommandDTOAssembler;
@@ -86,7 +88,17 @@ public class ProductController extends BaseController {
     @PutMapping(PRODUCT)
     public ResponseEntity<Void> modifyProduct(@PathVariable String productId, @RequestBody ModifyProductReqDto reqDto) {
         productCommandService.modifyProduct(modifyProductCommandDTOAssembler.toCommand(productId, reqDto));
-        return new ResponseEntity<>(null, getSuccessHeaders(), HttpStatus.OK);
+        return ResponseEntity.ok()
+                .headers(getSuccessHeaders())
+                .build();
+    }
+
+    @DeleteMapping(PRODUCT)
+    public ResponseEntity<Void> deleteProduct(@PathVariable String productId) {
+        productCommandService.deleteProduct(productId);
+        return ResponseEntity.ok()
+                .headers(getSuccessHeaders())
+                .build();
     }
 
     @Operation(summary = "상품 이미지 정보 조회 API", description = "상품 코드로 상품 이미지 정보를 조회한다.")

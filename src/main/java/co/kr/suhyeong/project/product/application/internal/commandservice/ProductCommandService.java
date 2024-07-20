@@ -53,4 +53,11 @@ public class ProductCommandService {
             productRepository.delete(originProduct);
         }
     }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteProduct(String productCode) {
+        Product product = productRepository.findById(productCode)
+                .orElseThrow(() -> new ApiException(NON_EXIST_DATA));
+        productRepository.delete(product);
+    }
 }
