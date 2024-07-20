@@ -7,7 +7,7 @@ import java.util.List;
 
 @Getter
 @Builder
-public class GetProductListRspDto {
+public class GetCategoriesRspDto {
     private long totalCount;
-    private List<GetProductRspDto> productList;
+    private List<GetCategoryRspDto> categoryList;
 }

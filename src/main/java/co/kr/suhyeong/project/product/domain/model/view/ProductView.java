@@ -3,7 +3,6 @@ package co.kr.suhyeong.project.product.domain.model.view;
 import co.kr.suhyeong.project.product.domain.model.aggregate.Category;
 import co.kr.suhyeong.project.product.domain.model.aggregate.Product;
 import co.kr.suhyeong.project.util.DateTimeUtils;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,7 +30,6 @@ public class ProductView {
 
     private int price;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<ProductImageView> imageList;
 
     public ProductView(Product product) {
