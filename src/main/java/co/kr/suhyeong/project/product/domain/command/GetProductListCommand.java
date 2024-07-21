@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 @Getter
@@ -14,7 +13,10 @@ import org.springframework.data.domain.Pageable;
 public class GetProductListCommand {
     private Pageable pageable;
 
-    public GetProductListCommand(Integer page, Integer size) {
-        this.pageable = PageRequest.of(page-1, size);
-    }
+    private String productCode;
+    private String productName;
+    private boolean isNameContains;
+
+    private String mainCategoryCode;
+    private String subCategoryCode;
 }

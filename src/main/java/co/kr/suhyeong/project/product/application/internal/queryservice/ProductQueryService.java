@@ -6,6 +6,7 @@ import co.kr.suhyeong.project.product.domain.command.GetProductImageCommand;
 import co.kr.suhyeong.project.product.domain.command.GetProductListCommand;
 import co.kr.suhyeong.project.product.domain.model.aggregate.Product;
 import co.kr.suhyeong.project.product.domain.model.view.ProductImageView;
+import co.kr.suhyeong.project.product.domain.model.view.ProductListView;
 import co.kr.suhyeong.project.product.domain.model.view.ProductView;
 import co.kr.suhyeong.project.product.domain.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static co.kr.suhyeong.project.constants.ResponseCode.NON_EXIST_DATA;
-import static co.kr.suhyeong.project.constants.ResponseCode.SERVER_ERROR;
 
 @Service
 @Slf4j
@@ -31,12 +31,13 @@ public class ProductQueryService {
     public ProductView getProduct(String productCode) {
         Product product = productRepository.findById(productCode)
                 .orElseThrow(() -> new ApiException(NON_EXIST_DATA));
-        ProductView view = new ProductView(product);
-        return view;
+        return new ProductView(product);
     }
 
-    public List<Product> getProductList(GetProductListCommand command) {
-            return productRepository.findProductListWithPagination(command.getPageable());
+    public ProductListView getProductList(GetProductListCommand command) {
+        long count = productRepository.countByProductListWithPagination(command);
+        List<ProductView> list = productRepository.findProductListWithPagination(command);
+        return new ProductListView(count, list);
     }
 
     public List<ProductImageView> getProductImages(GetProductImageCommand command) {

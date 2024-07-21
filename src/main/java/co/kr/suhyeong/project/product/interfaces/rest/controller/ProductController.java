@@ -4,7 +4,6 @@ import co.kr.suhyeong.project.product.application.internal.commandservice.Produc
 import co.kr.suhyeong.project.product.application.internal.queryservice.ProductQueryService;
 import co.kr.suhyeong.project.product.domain.command.GetProductImageCommand;
 import co.kr.suhyeong.project.product.domain.command.GetProductListCommand;
-import co.kr.suhyeong.project.product.domain.model.aggregate.Product;
 import co.kr.suhyeong.project.product.domain.model.view.ProductImageView;
 import co.kr.suhyeong.project.product.domain.model.view.ProductView;
 import co.kr.suhyeong.project.product.interfaces.rest.dto.CreateProductReqDto;
@@ -12,6 +11,7 @@ import co.kr.suhyeong.project.product.interfaces.rest.dto.ModifyProductReqDto;
 import co.kr.suhyeong.project.product.interfaces.rest.dto.GetProductImageRspDto;
 import co.kr.suhyeong.project.product.interfaces.rest.transform.CreateProductCommandDTOAssembler;
 import co.kr.suhyeong.project.product.interfaces.rest.transform.GetProductImageCommandDTOAssembler;
+import co.kr.suhyeong.project.product.interfaces.rest.transform.GetProductListCommandDTOAssembler;
 import co.kr.suhyeong.project.product.interfaces.rest.transform.ModifyProductCommandDTOAssembler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.headers.Header;
@@ -20,7 +20,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -43,6 +42,7 @@ public class ProductController extends BaseController {
     private final CreateProductCommandDTOAssembler createProductCommandDTOAssembler;
     private final GetProductImageCommandDTOAssembler getProductImageCommandDTOAssembler;
     private final ModifyProductCommandDTOAssembler modifyProductCommandDTOAssembler;
+    private final GetProductListCommandDTOAssembler getProductListCommandDTOAssembler;
 
     @Operation(summary = "상품 생성 API", description = "새로운 상품을 생성한다.")
     @ApiResponses(value = {
@@ -60,14 +60,19 @@ public class ProductController extends BaseController {
 
     @Operation(summary = "상품 리스트 조회 API", description = "상품 리스트를 페이징 처리하여 조회한다.")
     @GetMapping(PRODUCTS)
-    public ResponseEntity<List<Product>> getProductList(@RequestParam(required = false, defaultValue = "1") Integer page,
-                                               @RequestParam(required = false, defaultValue = "0") Integer size) {
-        GetProductListCommand command = new GetProductListCommand(page, size);
-        List<Product> productList = productQueryService.getProductList(command);
-
+    public ResponseEntity<Object> getProductList(@RequestParam(required = false, defaultValue = "1") Integer page,
+                                                        @RequestParam(required = false, defaultValue = "1") Integer size,
+                                                        @RequestParam(required = false) String productCode,
+                                                        @RequestParam(required = false) String productName,
+                                                        @RequestParam(required = false, defaultValue = "false") boolean isProductNameContains,
+                                                        @RequestParam(required = false) String mainCategoryCode,
+                                                        @RequestParam(required = false) String subCategoryCode) {
+        GetProductListCommand command = getProductListCommandDTOAssembler.toCommand(page, size, productCode, productName, isProductNameContains, mainCategoryCode, subCategoryCode);
+        ProductListView productListView = productQueryService.getProductList(command);
+        GetProductListRspDto rspDto = getProductListCommandDTOAssembler.toRspDto(productListView);
         return ResponseEntity.ok()
                 .headers(getSuccessHeaders())
-                .body(productList);
+                .body(rspDto);
     }
 
     @Operation(summary = "단건 상품 조회 API", description = "상품 코드로 상품 정보를 조회한다.")
