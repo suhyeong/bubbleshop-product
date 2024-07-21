@@ -29,6 +29,10 @@ public class Category extends TimeEntity implements Serializable {
     @Column(name = "cate_name")
     private String name;
 
+    @Description("카테고리명")
+    @Column(name = "cate_eng_name")
+    private String engName;
+
     @Description("카테고리 타입")
     @Column(name = "cate_type")
     @Convert(converter = CategoryTypeConverter.class)

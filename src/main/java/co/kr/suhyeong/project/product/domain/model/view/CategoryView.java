@@ -13,12 +13,14 @@ public class CategoryView {
     private String categoryCode;
     private CategoryType categoryType;
     private String categoryName;
+    private String categoryEngName;
     private Boolean isShow;
 
     public CategoryView(Category category) {
         this.categoryCode = category.getCode();
         this.categoryType = category.getCategoryType();
         this.categoryName = category.getName();
+        this.categoryEngName = category.getEngName();
         this.isShow = category.isShow();
     }
 }
