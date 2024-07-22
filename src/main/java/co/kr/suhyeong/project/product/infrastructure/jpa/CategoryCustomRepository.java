@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface CategoryCustomRepository {
     List<Category> findCategories(GetCategoriesCommand command);
-    List<Category> findCategoriesWithPagination(Pageable pageable);
+    long countCategories(GetCategoriesCommand command);
 }
