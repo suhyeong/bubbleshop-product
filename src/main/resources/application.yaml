@@ -70,6 +70,15 @@ feign:
         readTimeout: 3000
         loggerLevel: full
 
+cloud:
+  aws:
+    s3:
+      host: http://localhost:4566
+      access_key: product
+      secret_key: welcome
+      region: ap-east-1
+      bucket-name: product
+
 #  circuitbreaker:
 #    enabled: true
 #  circuitbreaker:
