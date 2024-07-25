@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static co.kr.suhyeong.project.constants.ResponseCode.INVALID_CATEGORY_TYPE;
 import static co.kr.suhyeong.project.constants.ResponseCode.NON_EXIST_DATA;
 
 @Slf4j
@@ -22,7 +23,7 @@ public class ProductCommandService {
 
     private void checkCategory(String mainCategoryCode, String subCategoryCode) {
         if(!categoryRepository.existsById(mainCategoryCode) || !categoryRepository.existsById(subCategoryCode))
-            throw new ApiException(NON_EXIST_DATA);
+            throw new ApiException(INVALID_CATEGORY_TYPE);
     }
 
     @Transactional(rollbackFor = Exception.class)

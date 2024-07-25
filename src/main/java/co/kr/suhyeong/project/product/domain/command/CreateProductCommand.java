@@ -3,7 +3,10 @@ package co.kr.suhyeong.project.product.domain.command;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.apache.commons.lang3.StringUtils;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Getter
@@ -13,17 +16,18 @@ public class CreateProductCommand {
     private String mainCategoryCode;
     private String subCategoryCode;
     private String name;
+    private String engName;
     private int price;
     private Set<String> optionName;
     private String defaultOptionName;
-    private String thumbnailImagePath;
-    private String detailImagePath;
+    private String thumbnailImageName;
+    private List<String> detailImageName;
 
     public boolean isThumbnailImageExist() {
-        return !this.thumbnailImagePath.isBlank();
+        return StringUtils.isNotBlank(this.thumbnailImageName);
     }
 
     public boolean isDetailImageExist() {
-        return !this.detailImagePath.isBlank();
+        return Objects.nonNull(detailImageName) && !this.detailImageName.isEmpty();
     }
 }

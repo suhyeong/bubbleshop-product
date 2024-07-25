@@ -36,6 +36,10 @@ public class Product extends TimeEntity implements Serializable {
     @Column(name = "product_nm")
     private String productName;
 
+    @Description("상품 영문명")
+    @Column(name = "product_eng_nm")
+    private String productEngName;
+
     @Description("상품 메인 카테고리 코드")
     @Column(name = "main_cate_code")
     private String mainCategoryCode;
@@ -68,6 +72,7 @@ public class Product extends TimeEntity implements Serializable {
     public Product(CreateProductCommand command, int sequence) {
         this.productCode = command.getMainCategoryCode() + command.getSubCategoryCode() + String.format("%05d", sequence);
         this.productName = command.getName();
+        this.productEngName = command.getEngName();
         this.mainCategoryCode = command.getMainCategoryCode();
         this.subCategoryCode = command.getSubCategoryCode();
         this.cost = command.getPrice();
@@ -80,13 +85,16 @@ public class Product extends TimeEntity implements Serializable {
     private void createProductImages(CreateProductCommand command) {
         this.images = new ArrayList<>();
         if(command.isThumbnailImageExist())
-            this.images.add(new ProductImage(this, ProductImageCode.THUMBNAIL_IMAGE, command.getThumbnailImagePath()));
-        if(command.isDetailImageExist())
-            this.images.add(new ProductImage(this, ProductImageCode.FULL_DETAIL_IMAGE, command.getDetailImagePath()));
+            this.images.add(new ProductImage(this, ProductImageCode.THUMBNAIL_IMAGE, command.getThumbnailImageName(), this.images.size() + 1));
+        if(command.isDetailImageExist()) {
+            command.getDetailImageName().forEach(name -> {
+                this.images.add(new ProductImage(this, ProductImageCode.FULL_DETAIL_IMAGE, name, this.images.size() + 1));
+            });
+        }
     }
 
     private void createProductOptions(Set<String> productOptions, String defaultOption) {
-        if(!productOptions.isEmpty()) {
+        if(Objects.nonNull(productOptions) && !productOptions.isEmpty()) {
             productOptions.forEach(option -> {
                 boolean isDefaultOption = defaultOption.equals(option);
                 this.options.add(new ProductOption(this.productCode, this.options.size() + 1, option, isDefaultOption));
@@ -103,10 +111,11 @@ public class Product extends TimeEntity implements Serializable {
         this.modifyProductOptions(command.getOptionName(), command.getDefaultOptionName());
     }
 
+    // TODO 수정
     private void modifyProductImages(ModifyProductCommand command) {
-        if(Objects.nonNull(this.images) && !this.images.isEmpty()) {
-            this.images.forEach(item -> item.modifyImagePath(command));
-        }
+//        if(Objects.nonNull(this.images) && !this.images.isEmpty()) {
+//            this.images.forEach(item -> item.modifyImagePath(command));
+//        }
     }
 
     private boolean isOptionExist() {

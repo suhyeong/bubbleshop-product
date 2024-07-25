@@ -1,16 +1,14 @@
 package co.kr.suhyeong.project.product.interfaces.rest.controller;
 
 import co.kr.suhyeong.project.product.application.internal.commandservice.ProductCommandService;
+import co.kr.suhyeong.project.product.application.internal.commandservice.ProductImageCommandService;
 import co.kr.suhyeong.project.product.application.internal.queryservice.ProductQueryService;
 import co.kr.suhyeong.project.product.domain.command.GetProductImageCommand;
 import co.kr.suhyeong.project.product.domain.command.GetProductListCommand;
 import co.kr.suhyeong.project.product.domain.model.view.ProductImageView;
 import co.kr.suhyeong.project.product.domain.model.view.ProductListView;
 import co.kr.suhyeong.project.product.domain.model.view.ProductView;
-import co.kr.suhyeong.project.product.interfaces.rest.dto.CreateProductReqDto;
-import co.kr.suhyeong.project.product.interfaces.rest.dto.GetProductListRspDto;
-import co.kr.suhyeong.project.product.interfaces.rest.dto.ModifyProductReqDto;
-import co.kr.suhyeong.project.product.interfaces.rest.dto.GetProductImageRspDto;
+import co.kr.suhyeong.project.product.interfaces.rest.dto.*;
 import co.kr.suhyeong.project.product.interfaces.rest.transform.CreateProductCommandDTOAssembler;
 import co.kr.suhyeong.project.product.interfaces.rest.transform.GetProductImageCommandDTOAssembler;
 import co.kr.suhyeong.project.product.interfaces.rest.transform.GetProductListCommandDTOAssembler;
@@ -23,9 +21,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -40,6 +40,7 @@ public class ProductController extends BaseController {
 
     private final ProductCommandService productCommandService;
     private final ProductQueryService productQueryService;
+    private final ProductImageCommandService productImageCommandService;
 
     private final CreateProductCommandDTOAssembler createProductCommandDTOAssembler;
     private final GetProductImageCommandDTOAssembler getProductImageCommandDTOAssembler;
@@ -58,6 +59,16 @@ public class ProductController extends BaseController {
     public ResponseEntity<Void> createProduct(@RequestBody @Validated CreateProductReqDto reqDto) {
         productCommandService.createProduct(createProductCommandDTOAssembler.toCommand(reqDto));
         return new ResponseEntity<>(null, getSuccessHeaders(), HttpStatus.OK);
+    }
+
+    @PostMapping(value = PRODUCT_TEMP_IMAGE, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<Object> uploadProductTempImages(@RequestParam MultipartFile file) {
+        String fileName = productImageCommandService.uploadProductTempImage(file);
+        UploadProductTempImageRspDto rspDto = new UploadProductTempImageRspDto(fileName);
+        return ResponseEntity
+                .ok()
+                .headers(getSuccessHeaders())
+                .body(rspDto);
     }
 
     @Operation(summary = "상품 리스트 조회 API", description = "상품 리스트를 페이징 처리하여 조회한다.")

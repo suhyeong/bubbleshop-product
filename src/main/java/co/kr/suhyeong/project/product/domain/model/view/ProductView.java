@@ -21,6 +21,7 @@ import static co.kr.suhyeong.project.util.DateTimeUtils.DATE_FORMAT_YYYY_MM_DD_D
 public class ProductView {
     private String productCode;
     private String productName;
+    private String productEngName;
     private String createdAt;
 
     private String mainCategoryCode;
@@ -35,6 +36,7 @@ public class ProductView {
     public ProductView(Product product) {
         this.productCode = product.getProductCode();
         this.productName = product.getProductName();
+        this.productEngName = product.getProductEngName();
         this.createdAt = DateTimeUtils.convertDateTimeToString(DATE_FORMAT_YYYY_MM_DD_DOT, product.getCreatedDate());
         this.mainCategoryCode = product.getMainCategoryCode();
         this.subCategoryCode = product.getSubCategoryCode();
@@ -47,6 +49,7 @@ public class ProductView {
     public ProductView(Product product, Category mainCategory, Category subCategory) {
         this.productCode = product.getProductCode();
         this.productName = product.getProductName();
+        this.productEngName = product.getProductEngName();
         this.createdAt = DateTimeUtils.convertDateTimeToString(DATE_FORMAT_YYYY_MM_DD_DOT, product.getCreatedDate());
         this.mainCategoryCode = product.getMainCategoryCode();
         this.mainCategoryCode = product.getMainCategoryCode();

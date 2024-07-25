@@ -32,8 +32,6 @@ services:
     environment:
       - SERVICES=s3
       - DEBUG=1
-      - DATA_DIR=/data/localstack/data
-      - PERSISTENCE=1 # 데이터 지속성을 위한 설정
     container_name: product-local-s3
     volumes:
       - "./localstack:/data/localstack/data"
