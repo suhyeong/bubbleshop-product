@@ -4,11 +4,13 @@ import co.kr.suhyeong.project.exception.ApiException;
 import co.kr.suhyeong.project.product.domain.command.CreateProductCommand;
 import co.kr.suhyeong.project.product.domain.command.ModifyProductCommand;
 import co.kr.suhyeong.project.product.domain.model.aggregate.Product;
+import co.kr.suhyeong.project.product.domain.model.valueobject.CreatedProductEvent;
 import co.kr.suhyeong.project.product.domain.repository.CategoryRepository;
 import co.kr.suhyeong.project.product.domain.repository.ProductRepository;
 import co.kr.suhyeong.project.product.domain.service.S3BucketService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +25,8 @@ public class ProductCommandService {
     private final CategoryRepository categoryRepository;
     private final S3BucketService s3BucketService;
 
+    private final ApplicationEventPublisher eventPublisher;
+
     private void checkCategory(String mainCategoryCode, String subCategoryCode) {
         if(!categoryRepository.existsById(mainCategoryCode) || !categoryRepository.existsById(subCategoryCode))
             throw new ApiException(INVALID_CATEGORY_TYPE);
@@ -35,6 +39,7 @@ public class ProductCommandService {
         Product product = new Product(command, count+1);
         s3BucketService.moveProductImagesFromTemp(product);
         productRepository.save(product);
+        eventPublisher.publishEvent(new CreatedProductEvent(product));
     }
 
     /**

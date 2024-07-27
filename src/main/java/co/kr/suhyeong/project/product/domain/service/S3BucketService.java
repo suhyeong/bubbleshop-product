@@ -11,7 +11,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.*;
+import software.amazon.awssdk.services.s3.model.CopyObjectRequest;
+import software.amazon.awssdk.services.s3.model.CopyObjectResponse;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -57,7 +60,7 @@ public class S3BucketService {
         }
     }
 
-    public List<String> putTempImage(List<MultipartFile> multipartFileList) {
+    public List<String> putTempImages(List<MultipartFile> multipartFileList) {
         List<String> uploadedKeys = new ArrayList<>(); // 중간에 실패하였을 경우 롤백을 위한 Key 리스트
 
         try {
@@ -67,7 +70,7 @@ public class S3BucketService {
             });
             return uploadedKeys;
         } catch (Exception e) {
-            uploadedKeys.forEach(this::deleteImage);
+            this.deleteTempImages(uploadedKeys);
             throw e;
         }
     }
@@ -83,7 +86,7 @@ public class S3BucketService {
                 uploadedKeys.add(key);
             });
         } catch (Exception e) {
-            uploadedKeys.forEach(this::deleteImage);
+            this.deleteTempImages(uploadedKeys);
             throw e;
         }
     }
@@ -105,11 +108,14 @@ public class S3BucketService {
         return destinationKey;
     }
 
-    public void deleteImage(String fileName) {
-        try {
-            s3Client.deleteObject(builder -> builder.bucket(bucketName).key(fileName).build());
-        } catch (Exception e) {
-            log.error("S3 롤백을 위한 이미지 삭제시 에러 발생, " , e.getCause());
-        }
+    public void deleteTempImages(List<String> keys) {
+        keys.forEach(key -> {
+            try {
+                s3Client.deleteObject(builder -> builder.bucket(bucketName).key(StaticValues.S3_TEMP_FOLDER + key).build());
+            } catch (Exception e) {
+                // 삭제 진행시 실패된 이미지는 건너뛰고 다음 이미지는 지울 수 있도록 try-catch 처리
+                log.error("S3 이미지 삭제시 에러 발생. 삭제 실패 이미지 파일명 : {} , Exception : {}", key, e.getStackTrace());
+            }
+        });
     }
 }

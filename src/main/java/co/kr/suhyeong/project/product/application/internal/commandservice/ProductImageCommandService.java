@@ -13,7 +13,7 @@ public class ProductImageCommandService {
     private final S3BucketService s3BucketService;
 
     public List<String> uploadProductTempImages(List<MultipartFile> files) {
-        return s3BucketService.putTempImage(files);
+        return s3BucketService.putTempImages(files);
     }
 
     public String uploadProductTempImage(MultipartFile file) {
