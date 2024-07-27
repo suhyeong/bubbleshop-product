@@ -1,5 +1,6 @@
 package co.kr.suhyeong.project.product.domain.command;
 
+import co.kr.suhyeong.project.product.domain.constant.FeatureType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -18,6 +19,7 @@ public class CreateProductCommand {
     private String name;
     private String engName;
     private int price;
+    private Set<FeatureType> featureTypes;
     private Set<String> optionName;
     private String defaultOptionName;
     private String thumbnailImageName;

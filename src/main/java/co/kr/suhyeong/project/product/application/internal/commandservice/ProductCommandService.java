@@ -6,6 +6,7 @@ import co.kr.suhyeong.project.product.domain.command.ModifyProductCommand;
 import co.kr.suhyeong.project.product.domain.model.aggregate.Product;
 import co.kr.suhyeong.project.product.domain.repository.CategoryRepository;
 import co.kr.suhyeong.project.product.domain.repository.ProductRepository;
+import co.kr.suhyeong.project.product.domain.service.S3BucketService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import static co.kr.suhyeong.project.constants.ResponseCode.NON_EXIST_DATA;
 public class ProductCommandService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final S3BucketService s3BucketService;
 
     private void checkCategory(String mainCategoryCode, String subCategoryCode) {
         if(!categoryRepository.existsById(mainCategoryCode) || !categoryRepository.existsById(subCategoryCode))
@@ -31,6 +33,7 @@ public class ProductCommandService {
         this.checkCategory(command.getMainCategoryCode(), command.getSubCategoryCode());
         int count = productRepository.countByMainCategoryCodeAndSubCategoryCode(command.getMainCategoryCode(), command.getSubCategoryCode());
         Product product = new Product(command, count+1);
+        s3BucketService.moveProductImagesFromTemp(product);
         productRepository.save(product);
     }
 

@@ -2,7 +2,9 @@ package co.kr.suhyeong.project.product.domain.model.aggregate;
 
 import co.kr.suhyeong.project.product.domain.command.CreateProductCommand;
 import co.kr.suhyeong.project.product.domain.command.ModifyProductCommand;
+import co.kr.suhyeong.project.product.domain.constant.FeatureType;
 import co.kr.suhyeong.project.product.domain.constant.ProductImageCode;
+import co.kr.suhyeong.project.product.domain.model.converter.ProductFeaturesTypeConverter;
 import co.kr.suhyeong.project.product.domain.model.converter.YOrNToBooleanConverter;
 import co.kr.suhyeong.project.product.domain.model.entity.ProductImage;
 import co.kr.suhyeong.project.product.domain.model.entity.ProductOption;
@@ -69,6 +71,11 @@ public class Product extends TimeEntity implements Serializable {
     @JsonIgnoreProperties({"product"})
     private List<ProductOption> options = new ArrayList<>();
 
+    @Description("상품 태그(특징)")
+    @Column(name = "product_features")
+    @Convert(converter = ProductFeaturesTypeConverter.class)
+    private Set<FeatureType> featureTypes;
+
     public Product(CreateProductCommand command, int sequence) {
         this.productCode = command.getMainCategoryCode() + command.getSubCategoryCode() + String.format("%05d", sequence);
         this.productName = command.getName();
@@ -78,6 +85,7 @@ public class Product extends TimeEntity implements Serializable {
         this.cost = command.getPrice();
         this.discount_rate = 0.0;
         this.isSale = false;
+        this.featureTypes = command.getFeatureTypes();
         this.createProductImages(command);
         this.createProductOptions(command.getOptionName(), command.getDefaultOptionName());
     }

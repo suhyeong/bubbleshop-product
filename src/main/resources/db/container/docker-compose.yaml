@@ -33,6 +33,7 @@ services:
       - SERVICES=s3
       - DEBUG=1
     container_name: product-local-s3
+    restart: always
     volumes:
       - "./localstack:/data/localstack/data"
       - "./localstack-init:/docker-entrypoint-initaws.d" # 초기화 스크립트 디렉터리
