@@ -70,7 +70,7 @@ public class S3BucketService {
             });
             return uploadedKeys;
         } catch (Exception e) {
-            this.deleteTempImages(uploadedKeys);
+            this.deleteS3Images(StaticValues.S3_TEMP_FOLDER, uploadedKeys);
             throw e;
         }
     }
@@ -86,7 +86,7 @@ public class S3BucketService {
                 uploadedKeys.add(key);
             });
         } catch (Exception e) {
-            this.deleteTempImages(uploadedKeys);
+            this.deleteS3Images(StaticValues.S3_TEMP_FOLDER, uploadedKeys);
             throw e;
         }
     }
@@ -108,10 +108,10 @@ public class S3BucketService {
         return destinationKey;
     }
 
-    public void deleteTempImages(List<String> keys) {
+    public void deleteS3Images(String prefixPath, List<String> keys) {
         keys.forEach(key -> {
             try {
-                s3Client.deleteObject(builder -> builder.bucket(bucketName).key(StaticValues.S3_TEMP_FOLDER + key).build());
+                s3Client.deleteObject(builder -> builder.bucket(bucketName).key(prefixPath + key).build());
             } catch (Exception e) {
                 // 삭제 진행시 실패된 이미지는 건너뛰고 다음 이미지는 지울 수 있도록 try-catch 처리
                 log.error("S3 이미지 삭제시 에러 발생. 삭제 실패 이미지 파일명 : {} , Exception : {}", key, e.getStackTrace());
