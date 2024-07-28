@@ -27,6 +27,10 @@ public class ProductImageId implements Serializable {
     @Convert(converter = ProductImageCodeConverter.class)
     private ProductImageCode divCode;
 
+    @Description("상품 이미지 순번")
+    @Column(name = "product_img_seq")
+    private int imageSequence;
+
     @JsonIgnore
     public boolean isThumbnailImage() {
         return this.divCode.equals(ProductImageCode.THUMBNAIL_IMAGE);

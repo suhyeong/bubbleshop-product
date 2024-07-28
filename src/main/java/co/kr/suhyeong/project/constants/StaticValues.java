@@ -18,4 +18,6 @@ public class StaticValues {
     public static class Profiles {
         public static final String localProfile = "default|local|unit-test";
     }
+
+    public static final String S3_TEMP_FOLDER = "temp/";
 }

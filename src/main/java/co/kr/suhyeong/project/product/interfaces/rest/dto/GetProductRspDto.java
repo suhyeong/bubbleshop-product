@@ -12,6 +12,7 @@ import java.util.List;
 public class GetProductRspDto {
     private String productCode;
     private String productName;
+    private String productEngName;
     private String createdAt;
 
     private String mainCategoryCode;

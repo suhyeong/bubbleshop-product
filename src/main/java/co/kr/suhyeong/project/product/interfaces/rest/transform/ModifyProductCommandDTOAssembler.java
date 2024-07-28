@@ -1,13 +1,12 @@
 package co.kr.suhyeong.project.product.interfaces.rest.transform;
 
 import co.kr.suhyeong.project.product.domain.command.ModifyProductCommand;
-import co.kr.suhyeong.project.product.domain.constant.OptionType;
+import co.kr.suhyeong.project.product.domain.constant.FeatureType;
 import co.kr.suhyeong.project.product.interfaces.rest.dto.ModifyProductReqDto;
 import org.mapstruct.*;
 
 import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 import static co.kr.suhyeong.project.constants.StaticValues.COMMON_Y;
 
@@ -17,7 +16,8 @@ public abstract class ModifyProductCommandDTOAssembler {
     @Mappings({
             @Mapping(target = "optionName", ignore = true),
             @Mapping(target = "defaultOptionName", source = "reqDto.defaultOption"),
-            @Mapping(target = "isSale", ignore = true)
+            @Mapping(target = "isSale", ignore = true),
+            @Mapping(target = "featureTypes", ignore = true)
     })
     public abstract ModifyProductCommand toCommand(String productCode, ModifyProductReqDto reqDto);
 
@@ -29,13 +29,8 @@ public abstract class ModifyProductCommandDTOAssembler {
         if(!reqDto.getOptions().isEmpty())
             builder.optionName(new HashSet<>(reqDto.getOptions()));
         builder.isSale(this.getSaleBoolean(reqDto.getSaleYn()));
-    }
-
-    private Set<OptionType> getOptionTypeList(List<String> options) {
-        Set<OptionType> optionTypeSet = new HashSet<>();
-        for(String option : options)
-            optionTypeSet.add(OptionType.find(option));
-        return optionTypeSet;
+        if(!reqDto.getFeatures().isEmpty())
+            builder.featureTypes(reqDto.getFeatures().stream().map(FeatureType::find).collect(Collectors.toSet()));
     }
 
     private boolean getSaleBoolean(String saleYn) {

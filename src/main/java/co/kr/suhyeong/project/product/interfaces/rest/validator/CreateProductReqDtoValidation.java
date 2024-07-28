@@ -10,6 +10,8 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.Payload;
 import java.lang.annotation.*;
+import java.util.List;
+import java.util.Objects;
 
 @Documented
 @Constraint(validatedBy = CreateProductReqDtoValidation.Validator.class)
@@ -35,7 +37,7 @@ public @interface CreateProductReqDtoValidation {
             return isProductNameValid(value.getName(), context)
                     && isCategoryCodeValid(value.getMainCategoryCode(), context)
                     && isCategoryCodeValid(value.getSubCategoryCode(), context)
-                    && isTypeValid(value.getType(), context);
+                    && isOptionValid(value.getOptions(), context);
         }
 
         /**
@@ -65,15 +67,15 @@ public @interface CreateProductReqDtoValidation {
         }
 
         /**
-         * 상품 타입 Validation Check
-         * @param type 상품 타입
+         * 상품 옵션 Validation Check
+         * @param option 상품 옵션
          * @param context
          * @return
          */
-        public boolean isTypeValid(String type, ConstraintValidatorContext context) {
-            boolean result = StringUtils.isNotBlank(type);
+        public boolean isOptionValid(List<String> option, ConstraintValidatorContext context) {
+            boolean result = Objects.nonNull(option) && !option.isEmpty();
             if(!result)
-                addConstraintViolationException(context, MessageConvertUtils.getErrorMessageReplace("상품 타입", ValidationExceptionType.BLANK));
+                addConstraintViolationException(context, MessageConvertUtils.getErrorMessageReplace("상품 옵션", ValidationExceptionType.BLANK));
             return result;
         }
 
