@@ -21,6 +21,9 @@ ext {
 	querydslVersion = '5.0.0'
 	springCloudVersion = '2021.0.3'
 	openApiVersion = '1.8.0'
+	awsSdkBomVersion = '1.12.529'
+	localstackVersion = '0.2.23'
+	awsSdkVersion = '2.26.21'
 }
 
 dependencies {
@@ -91,6 +94,11 @@ dependencies {
 
 	//open api
 	implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: openApiVersion
+
+	// aws s3
+	implementation platform("com.amazonaws:aws-java-sdk-bom:${awsSdkBomVersion}")
+	implementation "software.amazon.awssdk:s3:${awsSdkVersion}" // V2, com.amazonaws:aws-java-sdk-s3 = V1
+	implementation "cloud.localstack:localstack-utils:${localstackVersion}"
 }
 
 dependencyManagement {

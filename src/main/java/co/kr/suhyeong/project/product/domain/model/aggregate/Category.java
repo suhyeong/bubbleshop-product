@@ -1,5 +1,6 @@
 package co.kr.suhyeong.project.product.domain.model.aggregate;
 
+import co.kr.suhyeong.project.product.domain.command.ModifyCategoryCommand;
 import co.kr.suhyeong.project.product.domain.constant.CategoryType;
 import co.kr.suhyeong.project.product.domain.model.converter.CategoryTypeConverter;
 import co.kr.suhyeong.project.product.domain.model.converter.YOrNToBooleanConverter;
@@ -29,6 +30,10 @@ public class Category extends TimeEntity implements Serializable {
     @Column(name = "cate_name")
     private String name;
 
+    @Description("카테고리명")
+    @Column(name = "cate_eng_name")
+    private String engName;
+
     @Description("카테고리 타입")
     @Column(name = "cate_type")
     @Convert(converter = CategoryTypeConverter.class)
@@ -38,4 +43,11 @@ public class Category extends TimeEntity implements Serializable {
     @Column(name = "show_yn")
     @Convert(converter = YOrNToBooleanConverter.class)
     private boolean isShow;
+
+    public void modifyCategoryInfo(ModifyCategoryCommand command) {
+        this.name = command.getCategoryName();
+        this.engName = command.getCategoryEngName();
+        this.categoryType = command.getCategoryType();
+        this.isShow = command.isShow();
+    }
 }

@@ -30,8 +30,8 @@ public class ProductImage extends TimeEntity implements Serializable {
     @ToString.Exclude
     private Product product;
 
-    public ProductImage(Product product, ProductImageCode imageCode, String imagePath) {
-        this.productImageId = new ProductImageId(product.getProductCode(), imageCode);
+    public ProductImage(Product product, ProductImageCode imageCode, String imagePath, int sequence) {
+        this.productImageId = new ProductImageId(product.getProductCode(), imageCode, sequence);
         this.imgPath = imagePath;
     }
 
@@ -53,11 +53,12 @@ public class ProductImage extends TimeEntity implements Serializable {
         return this.productImageId.isDetailImage();
     }
 
-    public void modifyImagePath(ModifyProductCommand command) {
-        if(this.isThumbnailImage()) {
-            this.imgPath = command.getThumbnailImagePath();
-        } else if(this.isDetailImage()) {
-            this.imgPath = command.getDetailImagePath();
-        }
-    }
+    // TODO 수정
+//    public void modifyImagePath(ModifyProductCommand command) {
+//        if(this.isThumbnailImage()) {
+//            this.imgPath = command.getThumbnailImagePath();
+//        } else if(this.isDetailImage()) {
+//            this.imgPath = command.getDetailImagePath();
+//        }
+//    }
 }

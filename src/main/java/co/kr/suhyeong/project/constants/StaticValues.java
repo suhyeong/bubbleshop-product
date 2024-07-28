@@ -14,4 +14,10 @@ public class StaticValues {
         public static final String PRODUCT_KEY = "prd";
         public static final String CATEGORY_KEY = "cate";
     }
+
+    public static class Profiles {
+        public static final String localProfile = "default|local|unit-test";
+    }
+
+    public static final String S3_TEMP_FOLDER = "temp/";
 }

@@ -4,13 +4,17 @@ import co.kr.suhyeong.project.exception.ApiException;
 import co.kr.suhyeong.project.product.domain.command.CreateProductCommand;
 import co.kr.suhyeong.project.product.domain.command.ModifyProductCommand;
 import co.kr.suhyeong.project.product.domain.model.aggregate.Product;
+import co.kr.suhyeong.project.product.domain.model.valueobject.CreatedProductEvent;
 import co.kr.suhyeong.project.product.domain.repository.CategoryRepository;
 import co.kr.suhyeong.project.product.domain.repository.ProductRepository;
+import co.kr.suhyeong.project.product.domain.service.S3BucketService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static co.kr.suhyeong.project.constants.ResponseCode.INVALID_CATEGORY_TYPE;
 import static co.kr.suhyeong.project.constants.ResponseCode.NON_EXIST_DATA;
 
 @Slf4j
@@ -19,10 +23,13 @@ import static co.kr.suhyeong.project.constants.ResponseCode.NON_EXIST_DATA;
 public class ProductCommandService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final S3BucketService s3BucketService;
+
+    private final ApplicationEventPublisher eventPublisher;
 
     private void checkCategory(String mainCategoryCode, String subCategoryCode) {
         if(!categoryRepository.existsById(mainCategoryCode) || !categoryRepository.existsById(subCategoryCode))
-            throw new ApiException(NON_EXIST_DATA);
+            throw new ApiException(INVALID_CATEGORY_TYPE);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -30,7 +37,9 @@ public class ProductCommandService {
         this.checkCategory(command.getMainCategoryCode(), command.getSubCategoryCode());
         int count = productRepository.countByMainCategoryCodeAndSubCategoryCode(command.getMainCategoryCode(), command.getSubCategoryCode());
         Product product = new Product(command, count+1);
+        s3BucketService.moveProductImagesFromTemp(product);
         productRepository.save(product);
+        eventPublisher.publishEvent(new CreatedProductEvent(product));
     }
 
     /**

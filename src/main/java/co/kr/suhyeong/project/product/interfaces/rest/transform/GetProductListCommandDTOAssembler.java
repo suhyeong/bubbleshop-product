@@ -2,7 +2,9 @@ package co.kr.suhyeong.project.product.interfaces.rest.transform;
 
 import co.kr.suhyeong.project.product.domain.command.GetProductListCommand;
 import co.kr.suhyeong.project.product.domain.model.view.ProductListView;
+import co.kr.suhyeong.project.product.domain.model.view.ProductView;
 import co.kr.suhyeong.project.product.interfaces.rest.dto.GetProductListRspDto;
+import co.kr.suhyeong.project.product.interfaces.rest.dto.GetProductRspDto;
 import org.mapstruct.*;
 import org.springframework.data.domain.PageRequest;
 
@@ -26,7 +28,11 @@ public abstract class GetProductListCommandDTOAssembler {
     }
 
     @Mappings({
-            @Mapping(target = "totalCount", source = "productListView.count")
+            @Mapping(target = "totalCount", source = "productListView.count"),
+            @Mapping(target = "productList", source = "productList", qualifiedByName = "GetProductListRspDto.GetProductRspDto")
     })
     public abstract GetProductListRspDto toRspDto(ProductListView productListView);
+
+    @Named("GetProductListRspDto.GetProductRspDto")
+    public abstract GetProductRspDto toPrdRspDto(ProductView view);
 }

@@ -19,6 +19,8 @@ public class GetCategoriesCommand {
     private Pageable paging;
     private String categoryCode;
     private CategoryType categoryType;
+    private String categoryName;
+    private boolean isCategoryNameContains;
 
     public boolean isCategoryCodeExist() {
         return StringUtils.isNotBlank(categoryCode);
