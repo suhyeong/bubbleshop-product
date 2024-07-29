@@ -9,6 +9,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Getter
 public enum FeatureType {
     RANDOM("R", "랜덤 상품"),
     FIX("F", "고정 상품"),
@@ -16,7 +17,6 @@ public enum FeatureType {
     STOCK_UP("S", "재입고"),
     ;
 
-    @Getter
     private final String code;
     private final String desc;
 

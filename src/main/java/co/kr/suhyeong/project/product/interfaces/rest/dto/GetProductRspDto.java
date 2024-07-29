@@ -23,5 +23,11 @@ public class GetProductRspDto {
     private int price;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private List<ProductImageView> imageList;
+    private List<GetProductImageDetailRspDto> imageList;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private List<GetProductFeatureRspDto> features;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private List<GetProductOptionRspDto> options;
 }

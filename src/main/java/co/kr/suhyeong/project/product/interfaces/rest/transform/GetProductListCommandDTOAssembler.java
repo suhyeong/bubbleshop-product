@@ -34,5 +34,10 @@ public abstract class GetProductListCommandDTOAssembler {
     public abstract GetProductListRspDto toRspDto(ProductListView productListView);
 
     @Named("GetProductListRspDto.GetProductRspDto")
+    @Mappings({
+            @Mapping(target = "imageList", ignore = true),
+            @Mapping(target = "features", ignore = true),
+            @Mapping(target = "options", ignore = true)
+    })
     public abstract GetProductRspDto toPrdRspDto(ProductView view);
 }

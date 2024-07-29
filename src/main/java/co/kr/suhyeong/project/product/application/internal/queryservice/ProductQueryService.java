@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static co.kr.suhyeong.project.constants.ResponseCode.NON_EXIST_DATA;
@@ -29,9 +30,11 @@ public class ProductQueryService {
 
     @Cacheable(cacheNames = StaticValues.RedisKey.PRODUCT_KEY, key = "#productCode")
     public ProductView getProduct(String productCode) {
-        Product product = productRepository.findById(productCode)
-                .orElseThrow(() -> new ApiException(NON_EXIST_DATA));
-        return new ProductView(product);
+        ProductView product = productRepository.findByProductCode(productCode);
+        if(Objects.isNull(product))
+            throw new ApiException(NON_EXIST_DATA);
+
+        return product;
     }
 
     public ProductListView getProductList(GetProductListCommand command) {

@@ -35,19 +35,7 @@ public class ProductView {
 
     private List<ProductImageView> imageList;
     private Set<FeatureType> featureTypes;
-
-    public ProductView(Product product) {
-        this.productCode = product.getProductCode();
-        this.productName = product.getProductName();
-        this.productEngName = product.getProductEngName();
-        this.createdAt = DateTimeUtils.convertDateTimeToString(DATE_FORMAT_YYYY_MM_DD_DOT, product.getCreatedDate());
-        this.mainCategoryCode = product.getMainCategoryCode();
-        this.subCategoryCode = product.getSubCategoryCode();
-        this.price = product.getCost();
-        this.featureTypes = product.getFeatureTypes();
-        this.imageList = new ArrayList<>();
-        product.getImages().forEach(image -> imageList.add(new ProductImageView(image.getImageDivCode(), image.getImgPath())));
-    }
+    private List<ProductOptionView> options;
 
     @QueryProjection
     public ProductView(Product product, Category mainCategory, Category subCategory) {
@@ -56,11 +44,14 @@ public class ProductView {
         this.productEngName = product.getProductEngName();
         this.createdAt = DateTimeUtils.convertDateTimeToString(DATE_FORMAT_YYYY_MM_DD_DOT, product.getCreatedDate());
         this.mainCategoryCode = product.getMainCategoryCode();
-        this.mainCategoryCode = product.getMainCategoryCode();
         this.mainCategoryName = mainCategory.getName();
         this.subCategoryCode = product.getSubCategoryCode();
         this.subCategoryName = subCategory.getName();
         this.price = product.getCost();
         this.featureTypes = product.getFeatureTypes();
+        this.imageList = new ArrayList<>();
+        product.getImages().forEach(image -> imageList.add(new ProductImageView(image.getImageDivCode(), image.getImgPath())));
+        this.options = new ArrayList<>();
+        product.getOptions().forEach(option -> options.add(new ProductOptionView(option)));
     }
 }
