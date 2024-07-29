@@ -8,4 +8,5 @@ import lombok.Getter;
 public class GetProductImageDetailRspDto {
     private String divCode;
     private String path;
+    private String fullUrl;
 }

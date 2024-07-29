@@ -1,5 +1,6 @@
 package co.kr.suhyeong.project.product.application.internal.queryservice;
 
+import co.kr.suhyeong.project.config.ProductConfig;
 import co.kr.suhyeong.project.constants.StaticValues;
 import co.kr.suhyeong.project.exception.ApiException;
 import co.kr.suhyeong.project.product.domain.command.GetProductImageCommand;
@@ -27,6 +28,7 @@ import static co.kr.suhyeong.project.constants.ResponseCode.NON_EXIST_DATA;
 @Transactional(readOnly = true)
 public class ProductQueryService {
     private final ProductRepository productRepository;
+    private final ProductConfig productConfig;
 
     @Cacheable(cacheNames = StaticValues.RedisKey.PRODUCT_KEY, key = "#productCode")
     public ProductView getProduct(String productCode) {
@@ -34,6 +36,7 @@ public class ProductQueryService {
         if(Objects.isNull(product))
             throw new ApiException(NON_EXIST_DATA);
 
+        product.applyImagePath(productConfig.getImageUrl());
         return product;
     }
 

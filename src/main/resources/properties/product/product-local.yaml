@@ -1,2 +1,3 @@
 product:
   limit-count: 10
+  image-url: https://localhost.localstack.cloud:4566/product

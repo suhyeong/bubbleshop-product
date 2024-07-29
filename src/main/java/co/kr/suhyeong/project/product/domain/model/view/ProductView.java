@@ -54,4 +54,8 @@ public class ProductView {
         this.options = new ArrayList<>();
         product.getOptions().forEach(option -> options.add(new ProductOptionView(option)));
     }
+
+    public void applyImagePath(String imagePath) {
+        this.imageList.forEach(image -> image.applyImageFullPath(this.productCode, imagePath));
+    }
 }
