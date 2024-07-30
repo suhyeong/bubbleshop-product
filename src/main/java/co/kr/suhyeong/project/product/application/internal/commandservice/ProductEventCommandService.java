@@ -1,5 +1,6 @@
 package co.kr.suhyeong.project.product.application.internal.commandservice;
 
+import co.kr.suhyeong.project.constants.StaticValues;
 import co.kr.suhyeong.project.product.domain.model.aggregate.Product;
 import co.kr.suhyeong.project.product.domain.model.entity.ProductImage;
 import co.kr.suhyeong.project.product.domain.service.S3BucketService;
@@ -14,8 +15,17 @@ import java.util.stream.Collectors;
 public class ProductEventCommandService {
     private final S3BucketService s3BucketService;
 
+    private List<String> getProductImagesPath(Product product) {
+        return product.getImages().stream().map(ProductImage::getImgPath).collect(Collectors.toList());
+    }
+
     public void deleteProductTempImages(Product product) {
-        List<String> imagePathList = product.getImages().stream().map(ProductImage::getImgPath).collect(Collectors.toList());
-        s3BucketService.deleteTempImages(imagePathList);
+        List<String> imagePathList = this.getProductImagesPath(product);
+        s3BucketService.deleteS3Images(StaticValues.S3_TEMP_FOLDER, imagePathList);
+    }
+
+    public void deleteProductImages(Product product) {
+        List<String> imagePathList = this.getProductImagesPath(product);
+        s3BucketService.deleteS3Images(product.getProductCode() + "/", imagePathList);
     }
 }

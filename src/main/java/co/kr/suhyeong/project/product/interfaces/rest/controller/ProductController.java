@@ -99,7 +99,17 @@ public class ProductController extends BaseController {
     @PutMapping(PRODUCT)
     public ResponseEntity<Void> modifyProduct(@PathVariable String productId, @RequestBody ModifyProductReqDto reqDto) {
         productCommandService.modifyProduct(modifyProductCommandDTOAssembler.toCommand(productId, reqDto));
-        return new ResponseEntity<>(null, getSuccessHeaders(), HttpStatus.OK);
+        return ResponseEntity.ok()
+                .headers(getSuccessHeaders())
+                .build();
+    }
+
+    @DeleteMapping(PRODUCT)
+    public ResponseEntity<Void> deleteProduct(@PathVariable String productId) {
+        productCommandService.deleteProduct(productId);
+        return ResponseEntity.ok()
+                .headers(getSuccessHeaders())
+                .build();
     }
 
     @Operation(summary = "상품 이미지 정보 조회 API", description = "상품 코드로 상품 이미지 정보를 조회한다.")

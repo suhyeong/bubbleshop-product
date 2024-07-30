@@ -4,7 +4,8 @@ import co.kr.suhyeong.project.exception.ApiException;
 import co.kr.suhyeong.project.product.domain.command.CreateProductCommand;
 import co.kr.suhyeong.project.product.domain.command.ModifyProductCommand;
 import co.kr.suhyeong.project.product.domain.model.aggregate.Product;
-import co.kr.suhyeong.project.product.domain.model.valueobject.CreatedProductEvent;
+import co.kr.suhyeong.project.product.domain.model.event.CreatedProductEvent;
+import co.kr.suhyeong.project.product.domain.model.event.DeletedProductEvent;
 import co.kr.suhyeong.project.product.domain.repository.CategoryRepository;
 import co.kr.suhyeong.project.product.domain.repository.ProductRepository;
 import co.kr.suhyeong.project.product.domain.service.S3BucketService;
@@ -48,7 +49,7 @@ public class ProductCommandService {
      * 1. 수정 요청 상품 코드로 상품 정보를 조회하고 데이터가 없으면 에러를 리턴한다.
      * 2. 메인 카테고리 혹은 서브 카테고리 정보가 수정되었다면 새 상품 엔티티를 생성하여 저장한다.
      * 3. 메인 카테고리와 서브 카테고리 정보가 수정되지 않았다면 기존 상품 엔티티에서 데이터를 변경하여 저장한다.
-     * @param command
+     * @param command 상품 수정 Command
      */
     @Transactional(rollbackFor = Exception.class)
     public void modifyProduct(ModifyProductCommand command) {
@@ -61,5 +62,13 @@ public class ProductCommandService {
             this.createProduct(command);
             productRepository.delete(originProduct);
         }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteProduct(String productCode) {
+        Product product = productRepository.findById(productCode)
+                .orElseThrow(() -> new ApiException(NON_EXIST_DATA));
+        productRepository.delete(product);
+        eventPublisher.publishEvent(new DeletedProductEvent(product));
     }
 }
