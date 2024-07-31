@@ -32,6 +32,7 @@ public class ProductView {
     private String subCategoryName;
 
     private int price;
+    private int discountRate;
 
     private List<ProductImageView> imageList;
     private Set<FeatureType> featureTypes;
@@ -48,6 +49,7 @@ public class ProductView {
         this.subCategoryCode = product.getSubCategoryCode();
         this.subCategoryName = subCategory.getName();
         this.price = product.getCost();
+        this.discountRate = product.getDiscount_rate();
         this.featureTypes = product.getFeatureTypes();
         this.imageList = new ArrayList<>();
         product.getImages().forEach(image -> imageList.add(new ProductImageView(image.getImageDivCode(), image.getImgPath())));

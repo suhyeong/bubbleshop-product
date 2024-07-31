@@ -11,7 +11,7 @@ import lombok.*;
 public class ProductOptionView {
     private int optionSequence;
     private String optionName;
-    private boolean isDefaultOption;
+    private Boolean isDefaultOption;
     private int stock;
 
     public ProductOptionView(ProductOption option) {

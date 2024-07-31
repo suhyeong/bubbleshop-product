@@ -35,7 +35,6 @@ public abstract class GetProductCommandDTOAssembler {
     @Mappings({
             @Mapping(target = "sequence", source = "optionSequence"),
             @Mapping(target = "name", source = "optionName"),
-            @Mapping(target = "isDefaultOption", source = "defaultOption"),
             @Mapping(target = "stockCnt", source = "stock"),
     })
     public abstract GetProductOptionRspDto toPrdOptionRspDto(ProductOptionView optionView);

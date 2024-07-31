@@ -8,6 +8,6 @@ import lombok.Getter;
 public class GetProductOptionRspDto {
     private int sequence;
     private String name;
-    private boolean isDefaultOption;
+    private Boolean isDefaultOption;
     private int stockCnt;
 }
