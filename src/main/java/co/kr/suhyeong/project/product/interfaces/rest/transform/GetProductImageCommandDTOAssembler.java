@@ -40,7 +40,8 @@ public abstract class GetProductImageCommandDTOAssembler {
     @Named(value = "GetProductImageRspDto.List<GetProductImageDetailRspDto>")
     @Mappings({
             @Mapping(target = "divCode", source = "imageDivCode"),
-            @Mapping(target = "path", source = "imagePath")
+            @Mapping(target = "path", source = "imagePath"),
+            @Mapping(target = "fullUrl", source = "imageFullPath")
     })
     public abstract GetProductImageDetailRspDto toDetailRspDTO(ProductImageView productImage);
 }

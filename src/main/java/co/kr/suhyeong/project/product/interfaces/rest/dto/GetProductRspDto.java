@@ -1,6 +1,5 @@
 package co.kr.suhyeong.project.product.interfaces.rest.dto;
 
-import co.kr.suhyeong.project.product.domain.model.view.ProductImageView;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,7 +20,14 @@ public class GetProductRspDto {
     private String subCategoryName;
 
     private int price;
+    private int discountRate;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private List<ProductImageView> imageList;
+    private List<GetProductImageDetailRspDto> imageList;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private List<GetProductFeatureRspDto> features;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private List<GetProductOptionRspDto> options;
 }

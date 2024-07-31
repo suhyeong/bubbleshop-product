@@ -56,7 +56,7 @@ public class Product extends TimeEntity implements Serializable {
 
     @Description("할인율")
     @Column(name = "disc_rate")
-    private Double discount_rate;
+    private int discount_rate;
 
     @Description("판매 여부")
     @Convert(converter = YOrNToBooleanConverter.class)
@@ -83,7 +83,6 @@ public class Product extends TimeEntity implements Serializable {
         this.mainCategoryCode = command.getMainCategoryCode();
         this.subCategoryCode = command.getSubCategoryCode();
         this.cost = command.getPrice();
-        this.discount_rate = 0.0;
         this.isSale = false;
         this.featureTypes = command.getFeatureTypes();
         this.createProductImages(command);

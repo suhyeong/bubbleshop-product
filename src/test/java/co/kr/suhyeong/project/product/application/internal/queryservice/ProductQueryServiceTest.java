@@ -41,12 +41,12 @@ class ProductQueryServiceTest {
         // 해당 테스트 파일에서 수행되는 메소드 내부에 필요한 응답값들을 모킹처리해주면 된다.
         // 해당 서비스 내에서는 레포지토리에서 가져온 값이 모킹처리 되어야 한다.
         ProductImage image1 = ProductImage.builder()
-                .productImageId(new ProductImageId("001", ProductImageCode.THUMBNAIL_IMAGE))
+                .productImageId(new ProductImageId("001", ProductImageCode.THUMBNAIL_IMAGE, 1))
                 .imgPath("path1")
                 .build();
 
         ProductImage image2 = ProductImage.builder()
-                .productImageId(new ProductImageId("001", ProductImageCode.FULL_DETAIL_IMAGE))
+                .productImageId(new ProductImageId("001", ProductImageCode.FULL_DETAIL_IMAGE, 2))
                 .imgPath("path2")
                 .build();
 

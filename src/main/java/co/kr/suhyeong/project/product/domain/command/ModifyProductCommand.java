@@ -9,6 +9,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class ModifyProductCommand extends CreateProductCommand {
     private String productCode;
-    private Double discount;
+    private int discount;
     private boolean isSale;
 }

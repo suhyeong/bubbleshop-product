@@ -11,4 +11,5 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "product")
 public class ProductConfig {
     private int limitCount;
+    private String imageUrl;
 }

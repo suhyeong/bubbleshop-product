@@ -38,10 +38,10 @@ class ProductImageRepositoryTest {
         String path2 = "상세 Path 2";
 
         ProductImage image1 = ProductImage.builder()
-                .productImageId(new ProductImageId(productCode, THUMBNAIL_IMAGE))
+                .productImageId(new ProductImageId(productCode, THUMBNAIL_IMAGE, 1))
                 .imgPath(path1).build();
         ProductImage image2 = ProductImage.builder()
-                .productImageId(new ProductImageId(productCode, FULL_DETAIL_IMAGE))
+                .productImageId(new ProductImageId(productCode, FULL_DETAIL_IMAGE, 2))
                 .imgPath(path2)
                 .build();
         Product product = ProductMockData.createProduct(productCode, List.of(image1, image2));

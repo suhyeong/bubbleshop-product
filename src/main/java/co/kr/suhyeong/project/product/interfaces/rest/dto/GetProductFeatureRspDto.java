@@ -5,8 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class GetProductImageDetailRspDto {
-    private String divCode;
-    private String path;
-    private String fullUrl;
+public class GetProductFeatureRspDto {
+    private String code;
+    private String desc;
 }

@@ -9,10 +9,7 @@ import co.kr.suhyeong.project.product.domain.model.view.ProductImageView;
 import co.kr.suhyeong.project.product.domain.model.view.ProductListView;
 import co.kr.suhyeong.project.product.domain.model.view.ProductView;
 import co.kr.suhyeong.project.product.interfaces.rest.dto.*;
-import co.kr.suhyeong.project.product.interfaces.rest.transform.CreateProductCommandDTOAssembler;
-import co.kr.suhyeong.project.product.interfaces.rest.transform.GetProductImageCommandDTOAssembler;
-import co.kr.suhyeong.project.product.interfaces.rest.transform.GetProductListCommandDTOAssembler;
-import co.kr.suhyeong.project.product.interfaces.rest.transform.ModifyProductCommandDTOAssembler;
+import co.kr.suhyeong.project.product.interfaces.rest.transform.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -46,6 +43,7 @@ public class ProductController extends BaseController {
     private final GetProductImageCommandDTOAssembler getProductImageCommandDTOAssembler;
     private final ModifyProductCommandDTOAssembler modifyProductCommandDTOAssembler;
     private final GetProductListCommandDTOAssembler getProductListCommandDTOAssembler;
+    private final GetProductCommandDTOAssembler getProductCommandDTOAssembler;
 
     @Operation(summary = "상품 생성 API", description = "새로운 상품을 생성한다.")
     @ApiResponses(value = {
@@ -90,9 +88,10 @@ public class ProductController extends BaseController {
 
     @Operation(summary = "단건 상품 조회 API", description = "상품 코드로 상품 정보를 조회한다.")
     @GetMapping(PRODUCT)
-    public ResponseEntity<ProductView> getProduct(@PathVariable String productId) {
+    public ResponseEntity<Object> getProduct(@PathVariable String productId) {
         ProductView product = productQueryService.getProduct(productId);
-        return new ResponseEntity<>(product, getSuccessHeaders(), HttpStatus.OK);
+        GetProductRspDto rspDto = getProductCommandDTOAssembler.toPrdRspDto(product);
+        return new ResponseEntity<>(rspDto, getSuccessHeaders(), HttpStatus.OK);
     }
 
     @Operation(summary = "상품 수정 API", description = "상품 코드로 기존 상품 정보를 수정한다.")

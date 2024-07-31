@@ -1,5 +1,6 @@
 package co.kr.suhyeong.project.product.application.internal.queryservice;
 
+import co.kr.suhyeong.project.config.ProductConfig;
 import co.kr.suhyeong.project.constants.StaticValues;
 import co.kr.suhyeong.project.exception.ApiException;
 import co.kr.suhyeong.project.product.domain.command.GetProductImageCommand;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static co.kr.suhyeong.project.constants.ResponseCode.NON_EXIST_DATA;
@@ -26,12 +28,16 @@ import static co.kr.suhyeong.project.constants.ResponseCode.NON_EXIST_DATA;
 @Transactional(readOnly = true)
 public class ProductQueryService {
     private final ProductRepository productRepository;
+    private final ProductConfig productConfig;
 
     @Cacheable(cacheNames = StaticValues.RedisKey.PRODUCT_KEY, key = "#productCode")
     public ProductView getProduct(String productCode) {
-        Product product = productRepository.findById(productCode)
-                .orElseThrow(() -> new ApiException(NON_EXIST_DATA));
-        return new ProductView(product);
+        ProductView product = productRepository.findByProductCode(productCode);
+        if(Objects.isNull(product))
+            throw new ApiException(NON_EXIST_DATA);
+
+        product.applyImagePath(productConfig.getImageUrl());
+        return product;
     }
 
     public ProductListView getProductList(GetProductListCommand command) {
