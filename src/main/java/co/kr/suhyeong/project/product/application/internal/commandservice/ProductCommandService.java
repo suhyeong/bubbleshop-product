@@ -1,5 +1,6 @@
 package co.kr.suhyeong.project.product.application.internal.commandservice;
 
+import co.kr.suhyeong.project.constants.StaticValues;
 import co.kr.suhyeong.project.exception.ApiException;
 import co.kr.suhyeong.project.product.domain.command.CreateProductCommand;
 import co.kr.suhyeong.project.product.domain.command.ModifyProductCommand;
@@ -11,6 +12,7 @@ import co.kr.suhyeong.project.product.domain.repository.ProductRepository;
 import co.kr.suhyeong.project.product.domain.service.S3BucketService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,16 +54,12 @@ public class ProductCommandService {
      * @param command 상품 수정 Command
      */
     @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(cacheNames = StaticValues.RedisKey.PRODUCT_KEY, key = "#command.productCode")
     public void modifyProduct(ModifyProductCommand command) {
-        Product originProduct = productRepository.findById(command.getProductCode())
+        Product product = productRepository.findById(command.getProductCode())
                 .orElseThrow(() -> new ApiException(NON_EXIST_DATA));
-        if(originProduct.isSameCategory(command.getMainCategoryCode(), command.getSubCategoryCode())) {
-            originProduct.modifyProduct(command);
-            productRepository.save(originProduct);
-        } else {
-            this.createProduct(command);
-            productRepository.delete(originProduct);
-        }
+        product.modifyProduct(command);
+        productRepository.save(product);
     }
 
     @Transactional(rollbackFor = Exception.class)

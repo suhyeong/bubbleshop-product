@@ -21,6 +21,7 @@ public class GetProductRspDto {
 
     private int price;
     private int discountRate;
+    private Boolean isSale;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<GetProductImageDetailRspDto> imageList;

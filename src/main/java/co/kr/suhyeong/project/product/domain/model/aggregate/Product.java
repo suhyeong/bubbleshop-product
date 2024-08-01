@@ -111,15 +111,27 @@ public class Product extends TimeEntity implements Serializable {
 
     public void modifyProduct(ModifyProductCommand command) {
         this.productName = command.getName();
+        this.productEngName = command.getEngName();
         this.cost = command.getPrice();
         this.discount_rate = command.getDiscount();
         this.isSale = command.isSale();
-        this.modifyProductImages(command);
-        this.modifyProductOptions(command.getOptionName(), command.getDefaultOptionName());
+        this.featureTypes = command.getFeatureTypes();
+        this.modifyProductOptions(command.getOptions());
     }
 
-    // TODO 수정
+    /**
+     * 상품 이미지 수정
+     * 1. 기존 이미지가 존재할 경우
+     *  1-1. 썸네일 이미지가 삭제됐을 경우 썸네일 이미지 타입의 기존 데이터를 삭제한다.
+     * 2.
+     * @param command
+     */
     private void modifyProductImages(ModifyProductCommand command) {
+        if(Objects.nonNull(this.images) && !this.images.isEmpty()) {
+//            if(!command.isThumbnailImageExist())
+//                this.images.removeIf(ProductImage::isThumbnailImage);
+
+        }
 //        if(Objects.nonNull(this.images) && !this.images.isEmpty()) {
 //            this.images.forEach(item -> item.modifyImagePath(command));
 //        }
@@ -129,38 +141,17 @@ public class Product extends TimeEntity implements Serializable {
         return Objects.nonNull(this.options) && !this.options.isEmpty();
     }
 
-    private void modifyProductOptions(Set<String> newProductOptions, String defaultOption) {
-        // 새 옵션 정보가 없을 경우
-        if (Objects.isNull(newProductOptions) || newProductOptions.isEmpty()) {
-            //기존 옵션이 존재할 경우만 clear
-            if(this.isOptionExist())
-                this.options.clear();
+    private void modifyProductOptions(Set<ModifyProductCommand.ProductOption> newProductOptions) {
+        // 기존 옵션이 존재할 경우
+        if(this.isOptionExist()) {
+            // 기존 옵션 삭제
+            this.options.clear();
+
+            // 새 옵션 데이터 매핑
+            newProductOptions.forEach(newOption -> {
+                this.options.add(new ProductOption(this.productCode, newOption.getSequence(),
+                        newOption.getName(), newOption.isDefaultOption(), newOption.getStockCnt()));
+            });
         }
-        // 새 옵션 정보가 있을 경우
-        else {
-            // 기존 옵션이 존재할 경우
-            if(this.isOptionExist()) {
-                // 기존 옵션 중 새 옵션에 없는 옵션일 경우 옵션 리스트에서 삭제
-                this.options.removeIf(option -> !newProductOptions.contains(option.getOptionName()));
-
-                newProductOptions.forEach(option -> {
-                    boolean isDefaultOption = defaultOption.equals(option);
-
-                    //기존에 이미 존재하는 옵션이면 디폴트 여부만 수정, 존재하지 않다면 새 옵션 추가
-                    this.options.stream().filter(originOption -> originOption.getOptionName().equals(option)).findAny()
-                            .ifPresentOrElse(
-                                    sameOption -> sameOption.applyDefaultOption(isDefaultOption),
-                                    () -> this.options.add(new ProductOption(this.productCode, this.options.size() + 1, option, isDefaultOption)));
-                });
-            }
-            // 기존 옵션이 존재하지 않을 경우
-            else {
-                this.createProductOptions(newProductOptions, defaultOption);
-            }
-        }
-    }
-
-    public boolean isSameCategory(String newMainCategoryCode, String newSubCategoryCode) {
-        return this.mainCategoryCode.equals(newMainCategoryCode) && this.subCategoryCode.equals(newSubCategoryCode);
     }
 }

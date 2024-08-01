@@ -59,14 +59,12 @@ public class ProductController extends BaseController {
         return new ResponseEntity<>(null, getSuccessHeaders(), HttpStatus.OK);
     }
 
+    @Operation(summary = "상품 이미지 임시 저장 API", description = "상품 이미지를 단건으로 임시 저장한다.")
     @PostMapping(value = PRODUCT_TEMP_IMAGE, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<Object> uploadProductTempImages(@RequestParam MultipartFile file) {
         String fileName = productImageCommandService.uploadProductTempImage(file);
         UploadProductTempImageRspDto rspDto = new UploadProductTempImageRspDto(fileName);
-        return ResponseEntity
-                .ok()
-                .headers(getSuccessHeaders())
-                .body(rspDto);
+        return ResponseEntity.ok().headers(getSuccessHeaders()).body(rspDto);
     }
 
     @Operation(summary = "상품 리스트 조회 API", description = "상품 리스트를 페이징 처리하여 조회한다.")
@@ -103,6 +101,7 @@ public class ProductController extends BaseController {
                 .build();
     }
 
+    @Operation(summary = "상품 정보 삭제 API", description = "상품 코드로 상품 정보를 삭제한다..")
     @DeleteMapping(PRODUCT)
     public ResponseEntity<Void> deleteProduct(@PathVariable String productId) {
         productCommandService.deleteProduct(productId);
@@ -121,5 +120,7 @@ public class ProductController extends BaseController {
                 .headers(getSuccessHeaders())
                 .body(rspDto);
     }
+
+
 
 }
