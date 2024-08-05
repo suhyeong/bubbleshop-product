@@ -10,10 +10,12 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR,
         imports = {FeatureType.class})
 public abstract class GetProductCommandDTOAssembler {
-    @Named("GetProductListRspDto.GetProductRspDto")
-    @Mapping(target = "imageList", source = "imageList", qualifiedByName = "GetProductRspDto.List<GetProductImageDetailRspDto>")
-    @Mapping(target = "features", source = "featureTypes", qualifiedByName = "GetProductRspDto.List<GetProductFeatureRspDto>")
-    @Mapping(target = "options", source = "options", qualifiedByName = "GetProductRspDto.List<GetProductOptionRspDto>")
+
+    @Mappings({
+            @Mapping(target = "imageList", source = "imageList", qualifiedByName = "GetProductRspDto.List<GetProductImageDetailRspDto>"),
+            @Mapping(target = "features", source = "featureTypes", qualifiedByName = "GetProductRspDto.List<GetProductFeatureRspDto>"),
+            @Mapping(target = "options", source = "options", qualifiedByName = "GetProductRspDto.List<GetProductOptionRspDto>")
+    })
     public abstract GetProductRspDto toPrdRspDto(ProductView view);
 
     @Named("GetProductRspDto.List<GetProductImageDetailRspDto>")

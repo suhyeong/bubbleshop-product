@@ -17,4 +17,8 @@ public class Stock {
     @Description("상품 재고")
     @Column(name = "product_stock_cnt")
     private int count;
+
+    public void applyStockCount(int count) {
+        this.count = count;
+    }
 }
