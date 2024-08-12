@@ -17,11 +17,10 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static co.kr.suhyeong.project.constants.StaticValues.ImageStatus;
 
 @Entity
 @Table(name = "product_master")
@@ -66,9 +65,9 @@ public class Product extends TimeEntity implements Serializable {
     @Column(name = "sale_yn")
     private boolean isSale;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "product", targetEntity = ProductImage.class, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties({"product"})
-    private List<ProductImage> images;
+    private List<ProductImage> images = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties({"product"})
@@ -93,7 +92,6 @@ public class Product extends TimeEntity implements Serializable {
     }
 
     private void createProductImages(String thumbnailImageName, List<String> detailImageName) {
-        this.images = new ArrayList<>();
         if(StringUtils.isNotBlank(thumbnailImageName))
             this.images.add(new ProductImage(this, ProductImageCode.THUMBNAIL_IMAGE, thumbnailImageName, this.images.size() + 1));
         if(Objects.nonNull(detailImageName) && !detailImageName.isEmpty()) {
@@ -133,10 +131,14 @@ public class Product extends TimeEntity implements Serializable {
      *  3-1. 수정하려는 이미지 리스트 중 삭제된 이미지만 기존 이미지 리스트에서 제거한다.
      * @param command
      */
-    private void modifyProductImages(ModifyProductImageCommand command) {
+    public Map<String, List<String>> modifyProductImages(ModifyProductImageCommand command) {
+        Map<String, List<String>> map = new HashMap<>();
+
         if(!command.existModifyImage()) {
+            List<String> deleteList = this.images.stream().map(ProductImage::getImgPath).collect(Collectors.toList());
+            map.put(ImageStatus.DELETE, deleteList);
             this.images.clear();
-            return;
+            return map;
         }
 
         String thumbnailImageName = command.getThumbnailImagePath();
@@ -144,12 +146,37 @@ public class Product extends TimeEntity implements Serializable {
 
         if(Objects.isNull(this.images) || this.images.isEmpty()) {
             this.createProductImages(thumbnailImageName, detailImageNames);
-            return;
+            map.put(ImageStatus.ADD, command.getAllImagePath());
+            return map;
         }
 
-        List<Integer> notModifiedImageSequences = command.getNotModifyImageSequences();
-        this.images.removeIf(image -> !notModifiedImageSequences.contains(image.getImageSequence()));
+        // 새 이미지 정보를 담는 리스트 분리
+        this.images.forEach(image -> {
+            String originImageStatus = this.getImageStatusForModify(command, image);
+            if(originImageStatus != null) {
+                List<String> imgList = map.getOrDefault(originImageStatus, new ArrayList<>());
+                imgList.add(image.getImgPath());
+                map.put(originImageStatus, imgList);
+            }
+        });
 
+        map.put(ImageStatus.ADD, command.getAddImagePath());
+        this.images.clear();
+        this.createProductImages(thumbnailImageName, detailImageNames);
+
+        return map;
+    }
+
+    private String getImageStatusForModify(ModifyProductImageCommand command, ProductImage productImage) {
+        if(command.getNotModifyImageSequences().contains(productImage.getImageSequence())) {
+            // 수정이 필요하지 않은 이미지일 경우
+            return ImageStatus.STAY;
+        }
+        if(!command.getAllImagePath().contains(productImage.getImgPath())) {
+            // 삭제해야하는 이미지일 경우
+            return ImageStatus.DELETE;
+        }
+        return null;
     }
 
     private boolean isOptionExist() {

@@ -29,6 +29,11 @@ public class ModifyProductImageCommand {
                 .filter(Objects::nonNull).collect(Collectors.toList());
     }
 
+    public List<String> getAddImagePath() {
+        return this.images.stream().filter(item -> item.getSequence() == null)
+                .map(ProductImage::getPath).collect(Collectors.toList());
+    }
+
     public String getThumbnailImagePath() {
         Optional<ProductImage> image = this.images.stream().filter(ProductImage::isThumbnailImage).findFirst();
         return image.isPresent() ? image.get().getPath() : StringUtils.EMPTY;
@@ -36,6 +41,10 @@ public class ModifyProductImageCommand {
 
     public List<String> getDetailImagePath() {
         return this.images.stream().filter(ProductImage::isDetailImage).map(ProductImage::getPath).collect(Collectors.toList());
+    }
+
+    public List<String> getAllImagePath() {
+        return this.images.stream().map(ProductImage::getPath).collect(Collectors.toList());
     }
 
     /**

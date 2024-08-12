@@ -6,6 +6,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class GetProductImageDetailRspDto {
+    private int sequence;
     private String divCode;
     private String path;
     private String fullUrl;

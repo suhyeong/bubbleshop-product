@@ -1,6 +1,5 @@
 package co.kr.suhyeong.project.product.domain.model.entity;
 
-import co.kr.suhyeong.project.product.domain.command.ModifyProductCommand;
 import co.kr.suhyeong.project.product.domain.constant.ProductImageCode;
 import co.kr.suhyeong.project.product.domain.model.aggregate.Product;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -43,10 +42,6 @@ public class ProductImage extends TimeEntity implements Serializable {
         return this.productImageId.getDivCode().getCode();
     }
 
-    public void modifyProductThumbnailImagePath(String changePath) {
-        this.imgPath = changePath;
-    }
-
     @JsonIgnore
     public boolean isThumbnailImage() {
         return this.productImageId.isThumbnailImage();
@@ -56,13 +51,4 @@ public class ProductImage extends TimeEntity implements Serializable {
     public boolean isDetailImage() {
         return this.productImageId.isDetailImage();
     }
-
-    // TODO 수정
-//    public void modifyImagePath(ModifyProductCommand command) {
-//        if(this.isThumbnailImage()) {
-//            this.imgPath = command.getThumbnailImagePath();
-//        } else if(this.isDetailImage()) {
-//            this.imgPath = command.getDetailImagePath();
-//        }
-//    }
 }
