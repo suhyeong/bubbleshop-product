@@ -16,7 +16,6 @@ public abstract class ModifyProductCommandDTOAssembler {
 
     @Mappings({
             @Mapping(target = "options", source = "reqDto.options", qualifiedByName = "ModifyProductCommand.Set<ProductOption>"),
-            @Mapping(target = "isSale", source = "reqDto.sale"),
             @Mapping(target = "featureTypes", ignore = true)
     })
     public abstract ModifyProductCommand toCommand(String productCode, ModifyProductReqDto reqDto);

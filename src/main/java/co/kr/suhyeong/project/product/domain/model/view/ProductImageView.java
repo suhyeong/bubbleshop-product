@@ -1,5 +1,6 @@
 package co.kr.suhyeong.project.product.domain.model.view;
 
+import co.kr.suhyeong.project.product.domain.model.entity.ProductImage;
 import lombok.*;
 
 @Getter
@@ -8,9 +9,16 @@ import lombok.*;
 @NoArgsConstructor
 @ToString
 public class ProductImageView {
+    private int imageSequence;
     private String imageDivCode;
     private String imagePath;
     private String imageFullPath;
+
+    public ProductImageView(ProductImage productImage) {
+        this.imageSequence = productImage.getImageSequence();
+        this.imageDivCode = productImage.getImageDivCode();
+        this.imagePath = productImage.getImgPath();
+    }
 
     public ProductImageView(String imageDivCode, String imagePath) {
         this.imageDivCode = imageDivCode;

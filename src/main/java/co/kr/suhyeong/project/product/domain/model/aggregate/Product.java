@@ -2,6 +2,7 @@ package co.kr.suhyeong.project.product.domain.model.aggregate;
 
 import co.kr.suhyeong.project.product.domain.command.CreateProductCommand;
 import co.kr.suhyeong.project.product.domain.command.ModifyProductCommand;
+import co.kr.suhyeong.project.product.domain.command.ModifyProductImageCommand;
 import co.kr.suhyeong.project.product.domain.constant.FeatureType;
 import co.kr.suhyeong.project.product.domain.constant.ProductImageCode;
 import co.kr.suhyeong.project.product.domain.model.converter.ProductFeaturesTypeConverter;
@@ -12,13 +13,14 @@ import co.kr.suhyeong.project.product.domain.model.entity.TimeEntity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jdk.jfr.Description;
 import lombok.*;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static co.kr.suhyeong.project.constants.StaticValues.ImageStatus;
 
 @Entity
 @Table(name = "product_master")
@@ -63,9 +65,9 @@ public class Product extends TimeEntity implements Serializable {
     @Column(name = "sale_yn")
     private boolean isSale;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "product", targetEntity = ProductImage.class, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties({"product"})
-    private List<ProductImage> images;
+    private List<ProductImage> images = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties({"product"})
@@ -85,18 +87,16 @@ public class Product extends TimeEntity implements Serializable {
         this.cost = command.getPrice();
         this.isSale = false;
         this.featureTypes = command.getFeatureTypes();
-        this.createProductImages(command);
+        this.createProductImages(command.getThumbnailImageName(), command.getDetailImageName());
         this.createProductOptions(command.getOptionName(), command.getDefaultOptionName());
     }
 
-    private void createProductImages(CreateProductCommand command) {
-        this.images = new ArrayList<>();
-        if(command.isThumbnailImageExist())
-            this.images.add(new ProductImage(this, ProductImageCode.THUMBNAIL_IMAGE, command.getThumbnailImageName(), this.images.size() + 1));
-        if(command.isDetailImageExist()) {
-            command.getDetailImageName().forEach(name -> {
-                this.images.add(new ProductImage(this, ProductImageCode.FULL_DETAIL_IMAGE, name, this.images.size() + 1));
-            });
+    private void createProductImages(String thumbnailImageName, List<String> detailImageName) {
+        if(StringUtils.isNotBlank(thumbnailImageName))
+            this.images.add(new ProductImage(this, ProductImageCode.THUMBNAIL_IMAGE, thumbnailImageName, this.images.size() + 1));
+        if(Objects.nonNull(detailImageName) && !detailImageName.isEmpty()) {
+            detailImageName.forEach(name ->
+                this.images.add(new ProductImage(this, ProductImageCode.FULL_DETAIL_IMAGE, name, this.images.size() + 1)));
         }
     }
 
@@ -119,22 +119,64 @@ public class Product extends TimeEntity implements Serializable {
         this.modifyProductOptions(command.getOptions());
     }
 
+    public List<String> getImageNameToDelete(List<Integer> sequenceList) {
+        return this.images.stream().filter(image -> !sequenceList.contains(image.getImageSequence())).map(ProductImage::getImgPath).collect(Collectors.toList());
+    }
+
     /**
      * 상품 이미지 수정
-     * 1. 기존 이미지가 존재할 경우
-     *  1-1. 썸네일 이미지가 삭제됐을 경우 썸네일 이미지 타입의 기존 데이터를 삭제한다.
-     * 2.
+     * 1. 수정하려는 이미지 리스트가 없을 경우 리턴
+     * 2. 기존 이미지가 없는 경우 이미지 데이터 전부 새로 생성
+     * 3. 기존 이미지가 존재할 경우
+     *  3-1. 수정하려는 이미지 리스트 중 삭제된 이미지만 기존 이미지 리스트에서 제거한다.
      * @param command
      */
-    private void modifyProductImages(ModifyProductCommand command) {
-        if(Objects.nonNull(this.images) && !this.images.isEmpty()) {
-//            if(!command.isThumbnailImageExist())
-//                this.images.removeIf(ProductImage::isThumbnailImage);
+    public Map<String, List<String>> modifyProductImages(ModifyProductImageCommand command) {
+        Map<String, List<String>> map = new HashMap<>();
 
+        if(!command.existModifyImage()) {
+            List<String> deleteList = this.images.stream().map(ProductImage::getImgPath).collect(Collectors.toList());
+            map.put(ImageStatus.DELETE, deleteList);
+            this.images.clear();
+            return map;
         }
-//        if(Objects.nonNull(this.images) && !this.images.isEmpty()) {
-//            this.images.forEach(item -> item.modifyImagePath(command));
-//        }
+
+        String thumbnailImageName = command.getThumbnailImagePath();
+        List<String> detailImageNames = command.getDetailImagePath();
+
+        if(Objects.isNull(this.images) || this.images.isEmpty()) {
+            this.createProductImages(thumbnailImageName, detailImageNames);
+            map.put(ImageStatus.ADD, command.getAllImagePath());
+            return map;
+        }
+
+        // 새 이미지 정보를 담는 리스트 분리
+        this.images.forEach(image -> {
+            String originImageStatus = this.getImageStatusForModify(command, image);
+            if(originImageStatus != null) {
+                List<String> imgList = map.getOrDefault(originImageStatus, new ArrayList<>());
+                imgList.add(image.getImgPath());
+                map.put(originImageStatus, imgList);
+            }
+        });
+
+        map.put(ImageStatus.ADD, command.getAddImagePath());
+        this.images.clear();
+        this.createProductImages(thumbnailImageName, detailImageNames);
+
+        return map;
+    }
+
+    private String getImageStatusForModify(ModifyProductImageCommand command, ProductImage productImage) {
+        if(command.getNotModifyImageSequences().contains(productImage.getImageSequence())) {
+            // 수정이 필요하지 않은 이미지일 경우
+            return ImageStatus.STAY;
+        }
+        if(!command.getAllImagePath().contains(productImage.getImgPath())) {
+            // 삭제해야하는 이미지일 경우
+            return ImageStatus.DELETE;
+        }
+        return null;
     }
 
     private boolean isOptionExist() {

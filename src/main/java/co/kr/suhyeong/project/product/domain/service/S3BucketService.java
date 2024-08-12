@@ -78,11 +78,15 @@ public class S3BucketService {
     public void moveProductImagesFromTemp(Product product) {
         String productCode = product.getProductCode();
         List<String> imageNames = product.getImages().stream().map(ProductImage::getImgPath).collect(Collectors.toList());
+        this.moveProductImagesFromTemp(productCode, imageNames);
+    }
+
+    public void moveProductImagesFromTemp(String productCode, List<String> imagesPath) {
         List<String> uploadedKeys = new ArrayList<>(); // 중간에 실패하였을 경우 롤백을 위한 Key 리스트
 
         try {
-            imageNames.forEach(imageName -> {
-                String key = this.moveProductImageFromTemp(productCode, imageName);
+            imagesPath.forEach(imageName -> {
+                String key = this.copyProductImageFromTemp(productCode, imageName);
                 uploadedKeys.add(key);
             });
         } catch (Exception e) {
@@ -91,7 +95,7 @@ public class S3BucketService {
         }
     }
 
-    private String moveProductImageFromTemp(String productCode, String fileName) {
+    private String copyProductImageFromTemp(String productCode, String fileName) {
         String destinationKey = productCode + "/" + fileName;
         CopyObjectRequest copyReq = CopyObjectRequest.builder()
                 .sourceBucket(bucketName)

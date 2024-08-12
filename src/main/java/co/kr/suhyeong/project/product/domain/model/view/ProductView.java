@@ -54,7 +54,7 @@ public class ProductView {
         this.isSale = product.isSale();
         this.featureTypes = product.getFeatureTypes();
         this.imageList = new ArrayList<>();
-        product.getImages().forEach(image -> imageList.add(new ProductImageView(image.getImageDivCode(), image.getImgPath())));
+        product.getImages().forEach(image -> imageList.add(new ProductImageView(image)));
         this.options = new ArrayList<>();
         product.getOptions().forEach(option -> options.add(new ProductOptionView(option)));
     }

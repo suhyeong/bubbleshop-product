@@ -1,7 +1,6 @@
 package co.kr.suhyeong.project.product.interfaces.event;
 
 import co.kr.suhyeong.project.product.application.internal.commandservice.ProductEventCommandService;
-import co.kr.suhyeong.project.product.domain.model.event.CreatedProductEvent;
 import co.kr.suhyeong.project.product.domain.model.event.DeletedProductEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

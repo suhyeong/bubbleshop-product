@@ -47,10 +47,6 @@ public class ProductCommandService {
 
     /**
      * 상품 정보 수정
-     *
-     * 1. 수정 요청 상품 코드로 상품 정보를 조회하고 데이터가 없으면 에러를 리턴한다.
-     * 2. 메인 카테고리 혹은 서브 카테고리 정보가 수정되었다면 새 상품 엔티티를 생성하여 저장한다.
-     * 3. 메인 카테고리와 서브 카테고리 정보가 수정되지 않았다면 기존 상품 엔티티에서 데이터를 변경하여 저장한다.
      * @param command 상품 수정 Command
      */
     @Transactional(rollbackFor = Exception.class)
@@ -62,7 +58,12 @@ public class ProductCommandService {
         productRepository.save(product);
     }
 
+    /**
+     * 상품 정보 삭제
+     * @param productCode 상품 코드
+     */
     @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(cacheNames = StaticValues.RedisKey.PRODUCT_KEY, key = "#productCode")
     public void deleteProduct(String productCode) {
         Product product = productRepository.findById(productCode)
                 .orElseThrow(() -> new ApiException(NON_EXIST_DATA));
