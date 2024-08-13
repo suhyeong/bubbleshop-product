@@ -26,12 +26,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-@Tag(name = "Product API", description = "상품 API")
+import static com.bubbleshop.constants.StaticHeaders.*;
+import static com.bubbleshop.product.interfaces.rest.controller.ProductUrl.*;
+
+@Tag(name = "Product Management API", description = "상품 백오피스 API")
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(value = ProductUrl.PRODUCT_DEFAULT_URL)
-public class ProductController extends BaseController {
+@RequestMapping(value = PRODUCT_DEFAULT_URL, headers = BACKOFFICE_CHANNEL_HEADER)
+public class ProductManagementController extends BaseController {
 
     private final ProductCommandService productCommandService;
     private final ProductQueryService productQueryService;
@@ -52,14 +55,14 @@ public class ProductController extends BaseController {
             }),
             @ApiResponse(description = "요청값 Validation 실패", responseCode = "400")
     })
-    @PostMapping(ProductUrl.PRODUCTS)
+    @PostMapping(PRODUCTS)
     public ResponseEntity<Void> createProduct(@RequestBody @Validated CreateProductReqDto reqDto) {
         productCommandService.createProduct(createProductCommandDTOAssembler.toCommand(reqDto));
         return new ResponseEntity<>(null, getSuccessHeaders(), HttpStatus.OK);
     }
 
     @Operation(summary = "상품 이미지 임시 저장 API", description = "상품 이미지를 단건으로 임시 저장한다.")
-    @PostMapping(value = ProductUrl.PRODUCT_TEMP_IMAGE, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(value = PRODUCT_TEMP_IMAGE, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<Object> uploadProductTempImages(@RequestParam MultipartFile file) {
         String fileName = productImageCommandService.uploadProductTempImage(file);
         UploadProductTempImageRspDto rspDto = new UploadProductTempImageRspDto(fileName);
@@ -67,7 +70,7 @@ public class ProductController extends BaseController {
     }
 
     @Operation(summary = "상품 리스트 조회 API", description = "상품 리스트를 페이징 처리하여 조회한다.")
-    @GetMapping(ProductUrl.PRODUCTS)
+    @GetMapping(value = PRODUCTS)
     public ResponseEntity<Object> getProductList(@RequestParam(required = false, defaultValue = "1") Integer page,
                                                         @RequestParam(required = false, defaultValue = "1") Integer size,
                                                         @RequestParam(required = false) String productCode,
@@ -84,7 +87,7 @@ public class ProductController extends BaseController {
     }
 
     @Operation(summary = "단건 상품 조회 API", description = "상품 코드로 상품 정보를 조회한다.")
-    @GetMapping(ProductUrl.PRODUCT)
+    @GetMapping(PRODUCT)
     public ResponseEntity<Object> getProduct(@PathVariable String productId) {
         ProductView product = productQueryService.getProduct(productId);
         GetProductRspDto rspDto = getProductCommandDTOAssembler.toPrdRspDto(product);
@@ -92,7 +95,7 @@ public class ProductController extends BaseController {
     }
 
     @Operation(summary = "상품 수정 API", description = "상품 코드로 기존 상품 정보를 수정한다.")
-    @PutMapping(ProductUrl.PRODUCT)
+    @PutMapping(PRODUCT)
     public ResponseEntity<Void> modifyProduct(@PathVariable String productId, @RequestBody ModifyProductReqDto reqDto) {
         productCommandService.modifyProduct(modifyProductCommandDTOAssembler.toCommand(productId, reqDto));
         return ResponseEntity.ok()
@@ -101,7 +104,7 @@ public class ProductController extends BaseController {
     }
 
     @Operation(summary = "상품 정보 삭제 API", description = "상품 코드로 상품 정보를 삭제한다..")
-    @DeleteMapping(ProductUrl.PRODUCT)
+    @DeleteMapping(PRODUCT)
     public ResponseEntity<Void> deleteProduct(@PathVariable String productId) {
         productCommandService.deleteProduct(productId);
         return ResponseEntity.ok()
@@ -110,7 +113,7 @@ public class ProductController extends BaseController {
     }
 
     @Operation(summary = "상품 이미지 정보 조회 API", description = "상품 코드로 상품 이미지 정보를 조회한다.")
-    @GetMapping(ProductUrl.PRODUCT_IMAGE)
+    @GetMapping(PRODUCT_IMAGE)
     public ResponseEntity<GetProductImageRspDto> getProductImageByProductCode(@PathVariable String productId, @RequestParam String divCode) {
         GetProductImageCommand command = getProductImageCommandDTOAssembler.toCommand(productId, divCode);
         List<ProductImageView> list = productQueryService.getProductImages(command);
@@ -121,7 +124,7 @@ public class ProductController extends BaseController {
     }
 
     @Operation(summary = "상품 이미지 정보 수정 API", description = "상품 코드의 상품 이미지 정보를 수정한다.")
-    @PutMapping(ProductUrl.PRODUCT_IMAGE)
+    @PutMapping(PRODUCT_IMAGE)
     public ResponseEntity<Void> modifyProductImage(@PathVariable String productId, @RequestBody ModifyProductImageReqDto reqDto) {
         productImageCommandService.modifyProductImages(modifyProductImageCommandDTOAssembler.toCommand(productId, reqDto));
         return ResponseEntity.ok().headers(getSuccessHeaders()).build();

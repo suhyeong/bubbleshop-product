@@ -18,19 +18,22 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "Category API", description = "카테고리 API")
+import static com.bubbleshop.constants.StaticHeaders.BACKOFFICE_CHANNEL_HEADER;
+import static com.bubbleshop.product.interfaces.rest.controller.CategoryUrl.*;
+
+@Tag(name = "Category Management API", description = "카테고리 백오피스 API")
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(value = CategoryUrl.CATEGORY_DEFAULT_URL)
-public class CategoryController extends BaseController {
+@RequestMapping(value = CATEGORY_DEFAULT_URL, headers = BACKOFFICE_CHANNEL_HEADER)
+public class CategoryManagementController extends BaseController {
 
     private final GetCategoriesCommandDTOAssembler getCategoriesCommandDTOAssembler;
     private final CategoryQueryService categoryQueryService;
     private final CreateCategoryCommandDTOAssembler createCategoryCommandDTOAssembler;
     private final CategoryCommandService categoryCommandService;
 
-    @GetMapping(CategoryUrl.CATEGORIES)
+    @GetMapping(CATEGORIES)
     public ResponseEntity<Object> getCategories(@RequestParam(required = false, defaultValue = "1") Integer page,
                                                 @RequestParam(required = false, defaultValue = "1") Integer size,
                                                 @RequestParam String pagingYn,
@@ -52,27 +55,27 @@ public class CategoryController extends BaseController {
         }
     }
 
-    @PostMapping(CategoryUrl.CATEGORIES)
+    @PostMapping(CATEGORIES)
     public ResponseEntity<Void> createCategory(@RequestBody @Validated CreateCategoryReqDto reqDto) {
         CreateCategoryCommand command = createCategoryCommandDTOAssembler.toCommand(reqDto);
         categoryCommandService.createCategory(command);
         return ResponseEntity.ok().headers(getSuccessHeaders()).build();
     }
 
-    @PutMapping(CategoryUrl.CATEGORY)
+    @PutMapping(CATEGORY)
     public ResponseEntity<Void> modifyCategory(@PathVariable String categoryCode, @RequestBody @Validated ModifyCategoryReqDto reqDto) {
         ModifyCategoryCommand command = createCategoryCommandDTOAssembler.toCommand(categoryCode, reqDto);
         categoryCommandService.modifyCategory(command);
         return ResponseEntity.ok().headers(getSuccessHeaders()).build();
     }
 
-    @DeleteMapping(CategoryUrl.CATEGORY)
+    @DeleteMapping(CATEGORY)
     public ResponseEntity<Void> deleteCategory(@PathVariable String categoryCode) {
         categoryCommandService.deleteCategory(categoryCode);
         return ResponseEntity.ok().headers(getSuccessHeaders()).build();
     }
 
-    @GetMapping(CategoryUrl.MAIN_CATEGORIES)
+    @GetMapping(MAIN_CATEGORIES)
     public ResponseEntity<Object> getMainCategories() {
 
         return ResponseEntity.ok()
@@ -80,7 +83,7 @@ public class CategoryController extends BaseController {
                 .body(null);
     }
 
-    @GetMapping(CategoryUrl.SUB_CATEGORIES)
+    @GetMapping(SUB_CATEGORIES)
     public ResponseEntity<Object> getSubCategories() {
 
         return ResponseEntity.ok()
