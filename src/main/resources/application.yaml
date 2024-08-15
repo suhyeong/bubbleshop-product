@@ -33,9 +33,9 @@ spring:
 
 logging:
   level:
-    org.springframework.web.servlet: debug
+    org.springframework.web.servlet: trace
     #org.springframework.boot.autoconfigure: debug
-    co.kr.suhyeong.project.product.infrastructure.feignclient: debug
+    com.bubbleshop.product.infrastructure.feignclient: debug
     org.hibernate.type.descriptor.sql.BasicBinder: trace
 
 ---
@@ -137,6 +137,11 @@ spring:
 
 host:
   member: http://localhost:${wiremock.server.port}
+
+cloud:
+  aws:
+    s3:
+      bucket-name: product
 ---
 # 개발
 spring:
