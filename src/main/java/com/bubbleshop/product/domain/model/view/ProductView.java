@@ -59,6 +59,11 @@ public class ProductView {
         product.getOptions().forEach(option -> options.add(new ProductOptionView(option)));
     }
 
+    public ProductView(Product product) {
+        this.productCode = product.getProductCode();
+        this.productName = product.getProductName();
+    }
+
     public void applyImagePath(String imagePath) {
         this.imageList.forEach(image -> image.applyImageFullPath(this.productCode, imagePath));
     }
