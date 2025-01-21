@@ -18,7 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,6 +46,17 @@ public class ProductQueryService {
         List<ProductView> list = productRepository.findProductListWithPagination(command);
         return new ProductListView(count, list);
     }
+
+    public Map<String, ProductView> getProductList(List<String> productIds) {
+        List<Product> products = productRepository.findProductsByProductCodeIn(productIds);
+
+        if(products.isEmpty())
+            return null;
+
+        List<ProductView> productViews = products.stream().map(ProductView::new).collect(Collectors.toList());
+        return productViews.stream().collect(Collectors.toMap(ProductView::getProductCode, Function.identity()));
+    }
+
 
     public List<ProductImageView> getProductImages(GetProductImageCommand command) {
         Product product = productRepository.findById(command.getProductCode())
