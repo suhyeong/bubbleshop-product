@@ -64,7 +64,7 @@ spring:
     locations: classpath:db/migration
 
 host:
-  member: localhost:8080
+  member: localhost:8081
 
 feign:
   client:
