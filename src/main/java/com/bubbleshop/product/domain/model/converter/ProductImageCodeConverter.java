@@ -2,7 +2,7 @@ package com.bubbleshop.product.domain.model.converter;
 
 import com.bubbleshop.product.domain.constant.ProductImageCode;
 
-import javax.persistence.AttributeConverter;
+import jakarta.persistence.AttributeConverter;
 
 public class ProductImageCodeConverter implements AttributeConverter<ProductImageCode, String> {
     @Override
