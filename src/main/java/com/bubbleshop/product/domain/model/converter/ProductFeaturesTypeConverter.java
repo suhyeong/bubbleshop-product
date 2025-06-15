@@ -3,7 +3,7 @@ package com.bubbleshop.product.domain.model.converter;
 import com.bubbleshop.product.domain.constant.FeatureType;
 import com.bubbleshop.util.JsonConvertUtils;
 
-import javax.persistence.AttributeConverter;
+import jakarta.persistence.AttributeConverter;
 import java.util.Set;
 import java.util.stream.Collectors;
 
