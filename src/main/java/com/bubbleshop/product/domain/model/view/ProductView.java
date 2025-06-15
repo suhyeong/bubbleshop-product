@@ -10,9 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static com.bubbleshop.util.DateTimeUtils.DATE_FORMAT_YYYY_MM_DD_DOT;
 
@@ -38,6 +36,7 @@ public class ProductView {
     private List<ProductImageView> imageList;
     private Set<FeatureType> featureTypes;
     private List<ProductOptionView> options;
+    private Map<String, Integer> points; // todo
 
     @QueryProjection
     public ProductView(Product product, Category mainCategory, Category subCategory) {
@@ -57,6 +56,11 @@ public class ProductView {
         product.getImages().forEach(image -> imageList.add(new ProductImageView(image)));
         this.options = new ArrayList<>();
         product.getOptions().forEach(option -> options.add(new ProductOptionView(option)));
+        this.points = new HashMap<>();
+        if(Objects.nonNull(product.getPoints()) && !product.getPoints().isEmpty()) {
+            //product.getPoints().forEach((key, value) -> this.points.put(key, value));
+            this.points.putAll(product.getPoints());
+        }
     }
 
     public ProductView(Product product) {

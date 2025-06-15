@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Builder
@@ -31,4 +32,7 @@ public class GetProductRspDto {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<GetProductOptionRspDto> options;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Map<String, Integer> points;
 }
