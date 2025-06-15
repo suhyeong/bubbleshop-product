@@ -9,7 +9,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
+import java.io.Serial;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "product_option_master")
@@ -17,7 +20,10 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class ProductOption extends TimeEntity {
+public class ProductOption extends TimeEntity implements Serializable {
+    @Serial
+    private static final long serialVersionUID = -1849905011411438659L;
+
     @EmbeddedId
     private ProductOptionId productOptionId;
 

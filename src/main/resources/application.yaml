@@ -22,14 +22,15 @@ spring:
       on-profile: common-config
   flyway:
     enabled: false
-  redis:
-    host: localhost
-    port: 6379
-    password:
   servlet:
     multipart:
       max-file-size: 10MB
       max-request-size: 30MB
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password:
 
 logging:
   level:
@@ -52,7 +53,6 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
-    database-platform: org.hibernate.dialect.MySQL57Dialect
     show-sql: true
     properties:
       hibernate:
@@ -134,6 +134,9 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  data:
+    redis:
+      port: 6379
 
 host:
   member: http://localhost:${wiremock.server.port}

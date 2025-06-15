@@ -6,7 +6,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jdk.jfr.Description;
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
+import java.io.Serial;
 import java.io.Serializable;
 
 @Entity
@@ -17,6 +19,9 @@ import java.io.Serializable;
 @ToString
 @Builder
 public class ProductImage extends TimeEntity implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 6780321522174286346L;
+
     @EmbeddedId
     private ProductImageId productImageId;
 

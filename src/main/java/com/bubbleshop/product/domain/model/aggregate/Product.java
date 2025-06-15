@@ -3,22 +3,17 @@ package com.bubbleshop.product.domain.model.aggregate;
 import com.bubbleshop.product.domain.command.CreateProductCommand;
 import com.bubbleshop.product.domain.command.ModifyProductCommand;
 import com.bubbleshop.product.domain.command.ModifyProductImageCommand;
-import com.bubbleshop.product.domain.constant.FeatureType;
 import com.bubbleshop.product.domain.constant.ProductImageCode;
-import com.bubbleshop.product.domain.model.converter.ProductFeaturesTypeConverter;
 import com.bubbleshop.product.domain.model.converter.YOrNToBooleanConverter;
-import com.bubbleshop.product.domain.model.entity.ProductImage;
-import com.bubbleshop.product.domain.model.entity.ProductOption;
-import com.bubbleshop.product.domain.model.entity.TimeEntity;
+import com.bubbleshop.product.domain.model.entity.*;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.vladmihalcea.hibernate.type.json.JsonType;
+import jakarta.persistence.*;
 import jdk.jfr.Description;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
+import org.springframework.util.ObjectUtils;
 
-import javax.persistence.*;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -32,8 +27,9 @@ import static com.bubbleshop.constants.StaticValues.ImageStatus;
 @ToString
 @Getter
 @Builder
-@TypeDef(name = "json", typeClass = JsonType.class)
 public class Product extends TimeEntity implements Serializable {
+    @Serial
+    private static final long serialVersionUID = -4203406260459802808L;
 
     @Id
     @Description("상품 코드")
@@ -71,21 +67,19 @@ public class Product extends TimeEntity implements Serializable {
 
     @OneToMany(mappedBy = "product", targetEntity = ProductImage.class, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties({"product"})
-    private List<ProductImage> images = new ArrayList<>();
+    private final List<ProductImage> images = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties({"product"})
-    private List<ProductOption> options = new ArrayList<>();
+    private final List<ProductOption> options = new ArrayList<>();
 
-    @Description("상품 태그(특징)")
-    @Column(name = "product_features")
-    @Convert(converter = ProductFeaturesTypeConverter.class)
-    private Set<FeatureType> featureTypes;
+    @OneToMany(mappedBy = "product", targetEntity = ProductFeature.class, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties({"product"})
+    private final List<ProductFeature> features = new ArrayList<>();
 
-    @Description("상품 지급 포인트")
-    @Column(name = "product_points")
-    @Type(type = "json")
-    private Map<String, Integer> points;
+    @OneToMany(mappedBy = "product", targetEntity = ProductPoint.class, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties({"product"})
+    private final List<ProductPoint> points = new ArrayList<>();
 
     public Product(CreateProductCommand command, int sequence) {
         this.productCode = command.getMainCategoryCode() + command.getSubCategoryCode() + String.format("%05d", sequence);
@@ -96,7 +90,7 @@ public class Product extends TimeEntity implements Serializable {
         this.cost = command.getPrice();
         this.isSale = false;
         if(Objects.nonNull(command.getFeatureTypes()) && !command.getFeatureTypes().isEmpty()) {
-            this.featureTypes = command.getFeatureTypes();
+            command.getFeatureTypes().forEach(featureType -> this.features.add(new ProductFeature(this.productCode, featureType)));
         }
         this.createProductImages(command.getThumbnailImageName(), command.getDetailImageName());
         this.createProductOptions(command.getOptionName(), command.getDefaultOptionName());
@@ -127,7 +121,8 @@ public class Product extends TimeEntity implements Serializable {
         this.discount_rate = command.getDiscount();
         this.isSale = command.isSale();
         if(Objects.nonNull(command.getFeatureTypes()) && !command.getFeatureTypes().isEmpty()) {
-            this.featureTypes = command.getFeatureTypes();
+            this.features.clear();
+            command.getFeatureTypes().forEach(featureType -> this.features.add(new ProductFeature(this.productCode, featureType)));
         }
         this.modifyProductOptions(command.getOptions());
     }
@@ -157,7 +152,7 @@ public class Product extends TimeEntity implements Serializable {
         String thumbnailImageName = command.getThumbnailImagePath();
         List<String> detailImageNames = command.getDetailImagePath();
 
-        if(Objects.isNull(this.images) || this.images.isEmpty()) {
+        if(ObjectUtils.isEmpty(this.images)) {
             this.createProductImages(thumbnailImageName, detailImageNames);
             map.put(ImageStatus.ADD, command.getAllImagePath());
             return map;
@@ -192,9 +187,7 @@ public class Product extends TimeEntity implements Serializable {
         return null;
     }
 
-    private boolean isOptionExist() {
-        return Objects.nonNull(this.options) && !this.options.isEmpty();
-    }
+    private boolean isOptionExist() { return ObjectUtils.isEmpty(this.options); }
 
     private void modifyProductOptions(Set<ModifyProductCommand.ProductOption> newProductOptions) {
         // 기존 옵션이 존재할 경우
