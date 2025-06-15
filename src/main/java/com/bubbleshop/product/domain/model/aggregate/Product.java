@@ -11,9 +11,12 @@ import com.bubbleshop.product.domain.model.entity.ProductImage;
 import com.bubbleshop.product.domain.model.entity.ProductOption;
 import com.bubbleshop.product.domain.model.entity.TimeEntity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.vladmihalcea.hibernate.type.json.JsonType;
 import jdk.jfr.Description;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -29,6 +32,7 @@ import static com.bubbleshop.constants.StaticValues.ImageStatus;
 @ToString
 @Getter
 @Builder
+@TypeDef(name = "json", typeClass = JsonType.class)
 public class Product extends TimeEntity implements Serializable {
 
     @Id
@@ -78,6 +82,11 @@ public class Product extends TimeEntity implements Serializable {
     @Convert(converter = ProductFeaturesTypeConverter.class)
     private Set<FeatureType> featureTypes;
 
+    @Description("상품 지급 포인트")
+    @Column(name = "product_points")
+    @Type(type = "json")
+    private Map<String, Integer> points;
+
     public Product(CreateProductCommand command, int sequence) {
         this.productCode = command.getMainCategoryCode() + command.getSubCategoryCode() + String.format("%05d", sequence);
         this.productName = command.getName();
@@ -86,7 +95,9 @@ public class Product extends TimeEntity implements Serializable {
         this.subCategoryCode = command.getSubCategoryCode();
         this.cost = command.getPrice();
         this.isSale = false;
-        this.featureTypes = command.getFeatureTypes();
+        if(Objects.nonNull(command.getFeatureTypes()) && !command.getFeatureTypes().isEmpty()) {
+            this.featureTypes = command.getFeatureTypes();
+        }
         this.createProductImages(command.getThumbnailImageName(), command.getDetailImageName());
         this.createProductOptions(command.getOptionName(), command.getDefaultOptionName());
     }
@@ -115,7 +126,9 @@ public class Product extends TimeEntity implements Serializable {
         this.cost = command.getPrice();
         this.discount_rate = command.getDiscount();
         this.isSale = command.isSale();
-        this.featureTypes = command.getFeatureTypes();
+        if(Objects.nonNull(command.getFeatureTypes()) && !command.getFeatureTypes().isEmpty()) {
+            this.featureTypes = command.getFeatureTypes();
+        }
         this.modifyProductOptions(command.getOptions());
     }
 

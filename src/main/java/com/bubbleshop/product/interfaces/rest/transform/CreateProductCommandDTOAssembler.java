@@ -25,7 +25,6 @@ public abstract class CreateProductCommandDTOAssembler {
             CreateProductReqDto reqDto
     ) {
         builder.optionName(new HashSet<>(reqDto.getOptions()));
-        builder.featureTypes(new HashSet<>());
         if(Objects.nonNull(reqDto.getFeatures()) && !reqDto.getFeatures().isEmpty())
             builder.featureTypes(reqDto.getFeatures().stream().map(FeatureType::find).collect(Collectors.toSet()));
     }
