@@ -1,6 +1,7 @@
 package com.bubbleshop.product.interfaces.rest.transform;
 
 import com.bubbleshop.product.domain.constant.FeatureType;
+import com.bubbleshop.product.domain.model.view.ProductFeatureView;
 import com.bubbleshop.product.domain.model.view.ProductImageView;
 import com.bubbleshop.product.domain.model.view.ProductOptionView;
 import com.bubbleshop.product.domain.model.view.ProductView;
@@ -32,10 +33,10 @@ public abstract class GetProductCommandDTOAssembler {
 
     @Named("GetProductRspDto.List<GetProductFeatureRspDto>")
     @Mappings({
-            @Mapping(target = "code", source = "featureType.code"),
-            @Mapping(target = "desc", source = "featureType.desc")
+            @Mapping(target = "code", source = "featureView.featureType.code"),
+            @Mapping(target = "desc", source = "featureView.featureType.desc")
     })
-    public abstract GetProductFeatureRspDto toPrdFeatureRspDto(FeatureType featureType);
+    public abstract GetProductFeatureRspDto toPrdFeatureRspDto(ProductFeatureView featureView);
 
     @Named("GetProductRspDto.List<GetProductOptionRspDto>")
     @Mappings({

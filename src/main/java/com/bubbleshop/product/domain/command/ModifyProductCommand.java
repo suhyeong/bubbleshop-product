@@ -25,6 +25,8 @@ public class ModifyProductCommand {
 
     @Builder
     @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class ProductOption {
         private int sequence;
         private String name;

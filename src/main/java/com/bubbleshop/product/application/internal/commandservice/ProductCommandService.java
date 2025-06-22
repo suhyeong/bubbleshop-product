@@ -1,5 +1,6 @@
 package com.bubbleshop.product.application.internal.commandservice;
 
+import com.bubbleshop.constants.ResponseCode;
 import com.bubbleshop.constants.StaticValues;
 import com.bubbleshop.exception.ApiException;
 import com.bubbleshop.product.domain.command.CreateProductCommand;
@@ -10,13 +11,11 @@ import com.bubbleshop.product.domain.model.event.DeletedProductEvent;
 import com.bubbleshop.product.domain.repository.CategoryRepository;
 import com.bubbleshop.product.domain.repository.ProductRepository;
 import com.bubbleshop.product.domain.service.S3BucketService;
-import com.bubbleshop.constants.ResponseCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -33,7 +32,6 @@ public class ProductCommandService {
             throw new ApiException(ResponseCode.INVALID_CATEGORY_TYPE);
     }
 
-    @Transactional(rollbackFor = Exception.class)
     public void createProduct(CreateProductCommand command) {
         this.checkCategory(command.getMainCategoryCode(), command.getSubCategoryCode());
         int count = productRepository.countByMainCategoryCodeAndSubCategoryCode(command.getMainCategoryCode(), command.getSubCategoryCode());
@@ -47,7 +45,6 @@ public class ProductCommandService {
      * 상품 정보 수정
      * @param command 상품 수정 Command
      */
-    @Transactional(rollbackFor = Exception.class)
     @CacheEvict(cacheNames = StaticValues.RedisKey.PRODUCT_KEY, key = "#command.productCode")
     public void modifyProduct(ModifyProductCommand command) {
         Product product = productRepository.findById(command.getProductCode())
@@ -60,7 +57,6 @@ public class ProductCommandService {
      * 상품 정보 삭제
      * @param productCode 상품 코드
      */
-    @Transactional(rollbackFor = Exception.class)
     @CacheEvict(cacheNames = StaticValues.RedisKey.PRODUCT_KEY, key = "#productCode")
     public void deleteProduct(String productCode) {
         Product product = productRepository.findById(productCode)
