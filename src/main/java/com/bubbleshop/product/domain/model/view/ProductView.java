@@ -1,6 +1,6 @@
 package com.bubbleshop.product.domain.model.view;
 
-import com.bubbleshop.product.domain.constant.FeatureType;
+import com.bubbleshop.product.domain.constant.PointType;
 import com.bubbleshop.product.domain.model.aggregate.Category;
 import com.bubbleshop.product.domain.model.aggregate.Product;
 import com.bubbleshop.util.DateTimeUtils;
@@ -10,7 +10,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.bubbleshop.util.DateTimeUtils.DATE_FORMAT_YYYY_MM_DD_DOT;
 
@@ -34,9 +37,9 @@ public class ProductView {
     private Boolean isSale;
 
     private List<ProductImageView> imageList;
-    private Set<FeatureType> featureTypes;
+    private List<ProductFeatureView> featureTypes;
     private List<ProductOptionView> options;
-    private Map<String, Integer> points; // todo
+    private Map<PointType, Integer> points;
 
     @QueryProjection
     public ProductView(Product product, Category mainCategory, Category subCategory) {
@@ -51,16 +54,18 @@ public class ProductView {
         this.price = product.getCost();
         this.discountRate = product.getDiscount_rate();
         this.isSale = product.isSale();
-        this.featureTypes = product.getFeatureTypes();
+
+        this.featureTypes = new ArrayList<>();
+        product.getFeatures().forEach(feature -> featureTypes.add(new ProductFeatureView(feature)));
+
         this.imageList = new ArrayList<>();
         product.getImages().forEach(image -> imageList.add(new ProductImageView(image)));
+
         this.options = new ArrayList<>();
         product.getOptions().forEach(option -> options.add(new ProductOptionView(option)));
+
         this.points = new HashMap<>();
-        if(Objects.nonNull(product.getPoints()) && !product.getPoints().isEmpty()) {
-            //product.getPoints().forEach((key, value) -> this.points.put(key, value));
-            this.points.putAll(product.getPoints());
-        }
+        product.getPoints().forEach(point -> points.put(point.getProductPointId().getPointType(), point.getSavePoints()));
     }
 
     public ProductView(Product product) {

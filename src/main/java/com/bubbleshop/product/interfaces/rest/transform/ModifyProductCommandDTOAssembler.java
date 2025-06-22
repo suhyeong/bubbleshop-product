@@ -18,7 +18,6 @@ public abstract class ModifyProductCommandDTOAssembler {
     public abstract ModifyProductCommand toCommand(String productCode, ModifyProductReqDto reqDto);
 
     @Named("ModifyProductCommand.Set<ProductOption>")
-    @Mapping(target = "isDefaultOption", source = "defaultOption")
     public abstract ModifyProductCommand.ProductOption toOptionCommand(ModifyProductOptionReqDto reqDto);
 
     @AfterMapping

@@ -17,7 +17,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -58,7 +57,7 @@ public class ProductManagementController extends BaseController {
     @PostMapping(PRODUCTS)
     public ResponseEntity<Void> createProduct(@RequestBody @Validated CreateProductReqDto reqDto) {
         productCommandService.createProduct(createProductCommandDTOAssembler.toCommand(reqDto));
-        return new ResponseEntity<>(null, getSuccessHeaders(), HttpStatus.OK);
+        return ResponseEntity.ok().headers(getSuccessHeaders()).build();
     }
 
     @Operation(summary = "상품 이미지 임시 저장 API", description = "상품 이미지를 단건으로 임시 저장한다.")
@@ -91,7 +90,9 @@ public class ProductManagementController extends BaseController {
     public ResponseEntity<Object> getProduct(@PathVariable String productId) {
         ProductView product = productQueryService.getProduct(productId);
         GetProductRspDto rspDto = getProductCommandDTOAssembler.toPrdRspDto(product);
-        return new ResponseEntity<>(rspDto, getSuccessHeaders(), HttpStatus.OK);
+        return ResponseEntity.ok()
+                .headers(getSuccessHeaders())
+                .body(rspDto);
     }
 
     @Operation(summary = "상품 수정 API", description = "상품 코드로 기존 상품 정보를 수정한다.")
