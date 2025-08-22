@@ -21,12 +21,16 @@ public class ModifyProductImageCommand {
     }
 
     /**
-     * 수정이 필요하지 않은 (sequence 가 존재) 데이터의 시퀀스만 리턴
+     * 시퀀스가 동일한 데이터가 있는지 체크
+     * @param imageSequence
      * @return
      */
-    public List<Integer> getNotModifyImageSequences() {
-        return this.images.stream().map(ProductImage::getSequence)
-                .filter(Objects::nonNull).collect(Collectors.toList());
+    public boolean isContainImageSequence(int imageSequence) {
+        for(ProductImage item : this.images) {
+            if(Objects.nonNull(item.getSequence()) && item.getSequence() == imageSequence)
+                return true;
+        }
+        return false;
     }
 
     public List<String> getAddImagePath() {
@@ -45,6 +49,14 @@ public class ModifyProductImageCommand {
 
     public List<String> getAllImagePath() {
         return this.images.stream().map(ProductImage::getPath).collect(Collectors.toList());
+    }
+
+    public boolean isContainImagePath(String path) {
+        for(ProductImage item : this.images) {
+            if(Objects.nonNull(item.getPath()) && item.getPath().equals(path))
+                return true;
+        }
+        return false;
     }
 
     /**

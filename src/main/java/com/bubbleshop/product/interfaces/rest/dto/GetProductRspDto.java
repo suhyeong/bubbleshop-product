@@ -34,5 +34,5 @@ public class GetProductRspDto {
     private List<GetProductOptionRspDto> options;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Map<String, Integer> points;
+    private List<GetProductPointRspDto> points;
 }

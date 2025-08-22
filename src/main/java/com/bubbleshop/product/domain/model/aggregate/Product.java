@@ -125,6 +125,7 @@ public class Product extends TimeEntity implements Serializable {
             command.getFeatureTypes().forEach(featureType -> this.features.add(new ProductFeature(this.productCode, featureType)));
         }
         this.modifyProductOptions(command.getOptions());
+        this.modifyProductPoints(command.getPoints());
     }
 
     public List<String> getImageNameToDelete(List<Integer> sequenceList) {
@@ -187,19 +188,31 @@ public class Product extends TimeEntity implements Serializable {
         return null;
     }
 
-    private boolean isOptionExist() { return ObjectUtils.isEmpty(this.options); }
+    private boolean isOptionExist() { return !ObjectUtils.isEmpty(this.options); }
+
+    private boolean isPointExist() { return !ObjectUtils.isEmpty(this.points); }
 
     private void modifyProductOptions(Set<ModifyProductCommand.ProductOption> newProductOptions) {
         // 기존 옵션이 존재할 경우
         if(this.isOptionExist()) {
             // 기존 옵션 삭제
             this.options.clear();
+        }
 
-            // 새 옵션 데이터 매핑
-            newProductOptions.forEach(newOption -> {
+        // 새 옵션 데이터 매핑
+        newProductOptions.forEach(newOption ->
                 this.options.add(new ProductOption(this.productCode, newOption.getSequence(),
-                        newOption.getName(), newOption.isDefaultOption(), newOption.getStockCnt()));
-            });
+                        newOption.getName(), newOption.isDefaultOption(), newOption.getStockCnt()))
+        );
+    }
+
+    private void modifyProductPoints(Set<ModifyProductCommand.ProductPoint> newPoints) {
+        if(this.isPointExist()) {
+            this.points.clear();
+        }
+
+        for(ModifyProductCommand.ProductPoint point : newPoints) {
+            this.points.add(new ProductPoint(this.productCode, point.getProductType(), point.getSavePoint()));
         }
     }
 }
