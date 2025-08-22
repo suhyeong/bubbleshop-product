@@ -1,12 +1,10 @@
 package com.bubbleshop.product.domain.model.entity;
 
+import com.bubbleshop.product.domain.constant.PointType;
 import com.bubbleshop.product.domain.model.aggregate.Product;
 import jakarta.persistence.*;
 import jdk.jfr.Description;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -32,4 +30,9 @@ public class ProductPoint extends TimeEntity implements Serializable {
     @JoinColumn(name = "product_code", insertable = false, updatable = false)
     @ToString.Exclude
     private Product product;
+
+    public ProductPoint(String productCode, PointType pointType, int savePoint) {
+        this.productPointId = new ProductPointId(productCode, pointType);
+        this.savePoints = savePoint;
+    }
 }

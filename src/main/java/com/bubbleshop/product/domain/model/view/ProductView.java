@@ -39,7 +39,7 @@ public class ProductView {
     private List<ProductImageView> imageList;
     private List<ProductFeatureView> featureTypes;
     private List<ProductOptionView> options;
-    private Map<PointType, Integer> points;
+    private List<ProductPointView> points;
 
     @QueryProjection
     public ProductView(Product product, Category mainCategory, Category subCategory) {
@@ -64,8 +64,8 @@ public class ProductView {
         this.options = new ArrayList<>();
         product.getOptions().forEach(option -> options.add(new ProductOptionView(option)));
 
-        this.points = new HashMap<>();
-        product.getPoints().forEach(point -> points.put(point.getProductPointId().getPointType(), point.getSavePoints()));
+        this.points = new ArrayList<>();
+        product.getPoints().forEach(point -> points.add(new ProductPointView(point)));
     }
 
     public ProductView(Product product) {

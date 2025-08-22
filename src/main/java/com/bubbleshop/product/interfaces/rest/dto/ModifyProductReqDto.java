@@ -21,4 +21,5 @@ public class ModifyProductReqDto {
     private int discount;
     private Boolean isSale;
     private List<ModifyProductOptionReqDto> options;
+    private List<ModifyProductPointReqDto> points;
 }
