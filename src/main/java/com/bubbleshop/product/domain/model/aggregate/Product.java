@@ -3,6 +3,7 @@ package com.bubbleshop.product.domain.model.aggregate;
 import com.bubbleshop.product.domain.command.CreateProductCommand;
 import com.bubbleshop.product.domain.command.ModifyProductCommand;
 import com.bubbleshop.product.domain.command.ModifyProductImageCommand;
+import com.bubbleshop.product.domain.constant.PointType;
 import com.bubbleshop.product.domain.constant.ProductImageCode;
 import com.bubbleshop.product.domain.model.converter.YOrNToBooleanConverter;
 import com.bubbleshop.product.domain.model.entity.*;
@@ -94,6 +95,7 @@ public class Product extends TimeEntity implements Serializable {
         }
         this.createProductImages(command.getThumbnailImageName(), command.getDetailImageName());
         this.createProductOptions(command.getOptionName(), command.getDefaultOptionName());
+        this.createProductPoints(command.getPoints());
     }
 
     private void createProductImages(String thumbnailImageName, List<String> detailImageName) {
@@ -206,13 +208,23 @@ public class Product extends TimeEntity implements Serializable {
         );
     }
 
+    private void addPoint(PointType pointType, int savePoint) {
+        this.points.add(new ProductPoint(this.productCode, pointType, savePoint));
+    }
+
     private void modifyProductPoints(Set<ModifyProductCommand.ProductPoint> newPoints) {
         if(this.isPointExist()) {
             this.points.clear();
         }
 
         for(ModifyProductCommand.ProductPoint point : newPoints) {
-            this.points.add(new ProductPoint(this.productCode, point.getProductType(), point.getSavePoint()));
+            this.addPoint(point.getProductType(), point.getSavePoint());
+        }
+    }
+
+    private void createProductPoints(Set<CreateProductCommand.ProductPoint> newPoints) {
+        for(CreateProductCommand.ProductPoint point : newPoints) {
+            this.addPoint(point.getProductType(), point.getSavePoint());
         }
     }
 }
