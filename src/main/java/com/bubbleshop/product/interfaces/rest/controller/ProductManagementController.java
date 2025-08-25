@@ -104,7 +104,7 @@ public class ProductManagementController extends BaseController {
                 .build();
     }
 
-    @Operation(summary = "상품 정보 삭제 API", description = "상품 코드로 상품 정보를 삭제한다..")
+    @Operation(summary = "상품 정보 삭제 API", description = "상품 코드로 상품 정보를 삭제한다.")
     @DeleteMapping(PRODUCT)
     public ResponseEntity<Void> deleteProduct(@PathVariable String productId) {
         productCommandService.deleteProduct(productId);

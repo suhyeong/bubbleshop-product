@@ -1,6 +1,9 @@
 package com.bubbleshop.product.domain.command;
 
 import com.bubbleshop.product.domain.constant.FeatureType;
+import com.bubbleshop.product.domain.constant.PointType;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -24,6 +27,16 @@ public class CreateProductCommand {
     private String defaultOptionName;
     private String thumbnailImageName;
     private List<String> detailImageName;
+    private Set<ProductPoint> points;
+
+    @Builder
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ProductPoint {
+        private PointType productType;
+        private int savePoint;
+    }
 
     public boolean isThumbnailImageExist() {
         return StringUtils.isNotBlank(this.thumbnailImageName);
