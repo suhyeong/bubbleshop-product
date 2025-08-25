@@ -24,6 +24,7 @@ public class CreateProductReqDto {
     private int price;
     private List<String> options;
     private String defaultOption;
+    private List<ModifyProductPointReqDto> points;
     private String thumbnailImageName;
     private List<String> detailImageName;
 }
