@@ -1,13 +1,8 @@
 package com.bubbleshop.product.interfaces.rest.transform;
 
 import com.bubbleshop.product.domain.constant.FeatureType;
-import com.bubbleshop.product.domain.model.view.ProductImageView;
-import com.bubbleshop.product.domain.model.view.ProductOptionView;
-import com.bubbleshop.product.domain.model.view.ProductView;
-import com.bubbleshop.product.interfaces.rest.dto.GetProductFeatureRspDto;
-import com.bubbleshop.product.interfaces.rest.dto.GetProductImageDetailRspDto;
-import com.bubbleshop.product.interfaces.rest.dto.GetProductOptionRspDto;
-import com.bubbleshop.product.interfaces.rest.dto.GetProductRspDto;
+import com.bubbleshop.product.domain.model.view.*;
+import com.bubbleshop.product.interfaces.rest.dto.*;
 import org.mapstruct.*;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR,
@@ -17,7 +12,8 @@ public abstract class GetProductCommandDTOAssembler {
     @Mappings({
             @Mapping(target = "imageList", source = "imageList", qualifiedByName = "GetProductRspDto.List<GetProductImageDetailRspDto>"),
             @Mapping(target = "features", source = "featureTypes", qualifiedByName = "GetProductRspDto.List<GetProductFeatureRspDto>"),
-            @Mapping(target = "options", source = "options", qualifiedByName = "GetProductRspDto.List<GetProductOptionRspDto>")
+            @Mapping(target = "options", source = "options", qualifiedByName = "GetProductRspDto.List<GetProductOptionRspDto>"),
+            @Mapping(target = "points", source = "points", qualifiedByName = "GetProductRspDto.List<GetProductPointRspDto>")
     })
     public abstract GetProductRspDto toPrdRspDto(ProductView view);
 
@@ -32,10 +28,10 @@ public abstract class GetProductCommandDTOAssembler {
 
     @Named("GetProductRspDto.List<GetProductFeatureRspDto>")
     @Mappings({
-            @Mapping(target = "code", source = "featureType.code"),
-            @Mapping(target = "desc", source = "featureType.desc")
+            @Mapping(target = "code", source = "featureView.featureType.code"),
+            @Mapping(target = "desc", source = "featureView.featureType.desc")
     })
-    public abstract GetProductFeatureRspDto toPrdFeatureRspDto(FeatureType featureType);
+    public abstract GetProductFeatureRspDto toPrdFeatureRspDto(ProductFeatureView featureView);
 
     @Named("GetProductRspDto.List<GetProductOptionRspDto>")
     @Mappings({
@@ -44,4 +40,11 @@ public abstract class GetProductCommandDTOAssembler {
             @Mapping(target = "stockCnt", source = "stock"),
     })
     public abstract GetProductOptionRspDto toPrdOptionRspDto(ProductOptionView optionView);
+
+    @Named("GetProductRspDto.List<GetProductPointRspDto>")
+    @Mappings({
+            @Mapping(target = "pointTypeCode", source = "pointView.pointType.code"),
+            @Mapping(target = "savePoint", source = "savePoint")
+    })
+    public abstract GetProductPointRspDto toPrdPointRspDto(ProductPointView pointView);
 }

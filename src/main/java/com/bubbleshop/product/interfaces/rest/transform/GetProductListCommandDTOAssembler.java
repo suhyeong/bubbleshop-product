@@ -37,7 +37,8 @@ public abstract class GetProductListCommandDTOAssembler {
     @Mappings({
             @Mapping(target = "imageList", ignore = true),
             @Mapping(target = "features", ignore = true),
-            @Mapping(target = "options", ignore = true)
+            @Mapping(target = "options", ignore = true),
+            @Mapping(target = "points", ignore = true),
     })
     public abstract GetProductRspDto toPrdRspDto(ProductView view);
 }

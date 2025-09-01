@@ -3,19 +3,18 @@ package com.bubbleshop.product.domain.model.aggregate;
 import com.bubbleshop.product.domain.command.CreateProductCommand;
 import com.bubbleshop.product.domain.command.ModifyProductCommand;
 import com.bubbleshop.product.domain.command.ModifyProductImageCommand;
-import com.bubbleshop.product.domain.constant.FeatureType;
+import com.bubbleshop.product.domain.constant.PointType;
 import com.bubbleshop.product.domain.constant.ProductImageCode;
-import com.bubbleshop.product.domain.model.converter.ProductFeaturesTypeConverter;
 import com.bubbleshop.product.domain.model.converter.YOrNToBooleanConverter;
-import com.bubbleshop.product.domain.model.entity.ProductImage;
-import com.bubbleshop.product.domain.model.entity.ProductOption;
-import com.bubbleshop.product.domain.model.entity.TimeEntity;
+import com.bubbleshop.product.domain.model.entity.*;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.*;
 import jdk.jfr.Description;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.ObjectUtils;
 
-import jakarta.persistence.*;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -30,6 +29,8 @@ import static com.bubbleshop.constants.StaticValues.ImageStatus;
 @Getter
 @Builder
 public class Product extends TimeEntity implements Serializable {
+    @Serial
+    private static final long serialVersionUID = -4203406260459802808L;
 
     @Id
     @Description("상품 코드")
@@ -67,16 +68,19 @@ public class Product extends TimeEntity implements Serializable {
 
     @OneToMany(mappedBy = "product", targetEntity = ProductImage.class, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties({"product"})
-    private List<ProductImage> images = new ArrayList<>();
+    private final List<ProductImage> images = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties({"product"})
-    private List<ProductOption> options = new ArrayList<>();
+    private final List<ProductOption> options = new ArrayList<>();
 
-    @Description("상품 태그(특징)")
-    @Column(name = "product_features")
-    @Convert(converter = ProductFeaturesTypeConverter.class)
-    private Set<FeatureType> featureTypes;
+    @OneToMany(mappedBy = "product", targetEntity = ProductFeature.class, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties({"product"})
+    private final List<ProductFeature> features = new ArrayList<>();
+
+    @OneToMany(mappedBy = "product", targetEntity = ProductPoint.class, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties({"product"})
+    private final List<ProductPoint> points = new ArrayList<>();
 
     public Product(CreateProductCommand command, int sequence) {
         this.productCode = command.getMainCategoryCode() + command.getSubCategoryCode() + String.format("%05d", sequence);
@@ -86,9 +90,12 @@ public class Product extends TimeEntity implements Serializable {
         this.subCategoryCode = command.getSubCategoryCode();
         this.cost = command.getPrice();
         this.isSale = false;
-        this.featureTypes = command.getFeatureTypes();
+        if(Objects.nonNull(command.getFeatureTypes()) && !command.getFeatureTypes().isEmpty()) {
+            command.getFeatureTypes().forEach(featureType -> this.features.add(new ProductFeature(this.productCode, featureType)));
+        }
         this.createProductImages(command.getThumbnailImageName(), command.getDetailImageName());
         this.createProductOptions(command.getOptionName(), command.getDefaultOptionName());
+        this.createProductPoints(command.getPoints());
     }
 
     private void createProductImages(String thumbnailImageName, List<String> detailImageName) {
@@ -115,8 +122,12 @@ public class Product extends TimeEntity implements Serializable {
         this.cost = command.getPrice();
         this.discount_rate = command.getDiscount();
         this.isSale = command.isSale();
-        this.featureTypes = command.getFeatureTypes();
+        if(Objects.nonNull(command.getFeatureTypes()) && !command.getFeatureTypes().isEmpty()) {
+            this.features.clear();
+            command.getFeatureTypes().forEach(featureType -> this.features.add(new ProductFeature(this.productCode, featureType)));
+        }
         this.modifyProductOptions(command.getOptions());
+        this.modifyProductPoints(command.getPoints());
     }
 
     public List<String> getImageNameToDelete(List<Integer> sequenceList) {
@@ -144,7 +155,7 @@ public class Product extends TimeEntity implements Serializable {
         String thumbnailImageName = command.getThumbnailImagePath();
         List<String> detailImageNames = command.getDetailImagePath();
 
-        if(Objects.isNull(this.images) || this.images.isEmpty()) {
+        if(ObjectUtils.isEmpty(this.images)) {
             this.createProductImages(thumbnailImageName, detailImageNames);
             map.put(ImageStatus.ADD, command.getAllImagePath());
             return map;
@@ -179,21 +190,41 @@ public class Product extends TimeEntity implements Serializable {
         return null;
     }
 
-    private boolean isOptionExist() {
-        return Objects.nonNull(this.options) && !this.options.isEmpty();
-    }
+    private boolean isOptionExist() { return !ObjectUtils.isEmpty(this.options); }
+
+    private boolean isPointExist() { return !ObjectUtils.isEmpty(this.points); }
 
     private void modifyProductOptions(Set<ModifyProductCommand.ProductOption> newProductOptions) {
         // 기존 옵션이 존재할 경우
         if(this.isOptionExist()) {
             // 기존 옵션 삭제
             this.options.clear();
+        }
 
-            // 새 옵션 데이터 매핑
-            newProductOptions.forEach(newOption -> {
+        // 새 옵션 데이터 매핑
+        newProductOptions.forEach(newOption ->
                 this.options.add(new ProductOption(this.productCode, newOption.getSequence(),
-                        newOption.getName(), newOption.isDefaultOption(), newOption.getStockCnt()));
-            });
+                        newOption.getName(), newOption.isDefaultOption(), newOption.getStockCnt()))
+        );
+    }
+
+    private void addPoint(PointType pointType, int savePoint) {
+        this.points.add(new ProductPoint(this.productCode, pointType, savePoint));
+    }
+
+    private void modifyProductPoints(Set<ModifyProductCommand.ProductPoint> newPoints) {
+        if(this.isPointExist()) {
+            this.points.clear();
+        }
+
+        for(ModifyProductCommand.ProductPoint point : newPoints) {
+            this.addPoint(point.getProductType(), point.getSavePoint());
+        }
+    }
+
+    private void createProductPoints(Set<CreateProductCommand.ProductPoint> newPoints) {
+        for(CreateProductCommand.ProductPoint point : newPoints) {
+            this.addPoint(point.getProductType(), point.getSavePoint());
         }
     }
 }
