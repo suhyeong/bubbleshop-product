@@ -19,6 +19,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static software.amazon.awssdk.core.sync.RequestBody.fromBytes;
@@ -36,6 +37,7 @@ public class S3BucketService {
         String fileName = multipartFile.getOriginalFilename();
         String contentType = multipartFile.getContentType();
 
+        fileName = UUID.randomUUID().toString();
         String key = StaticValues.S3_TEMP_FOLDER + fileName; //임시 폴더에 저장하기 위해 temp/ 붙여주기
 
         // S3 에 업로드
@@ -89,7 +91,7 @@ public class S3BucketService {
                 uploadedKeys.add(key);
             });
         } catch (Exception e) {
-            this.deleteS3Images(StaticValues.S3_TEMP_FOLDER, uploadedKeys);
+            this.deleteS3Images(productCode + "/", uploadedKeys);
             throw e;
         }
     }
