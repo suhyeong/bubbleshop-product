@@ -179,15 +179,15 @@ public class Product extends TimeEntity implements Serializable {
     }
 
     private String getImageStatusForModify(ModifyProductImageCommand command, ProductImage productImage) {
-        if(command.getNotModifyImageSequences().contains(productImage.getImageSequence())) {
+        if(command.isContainImageSequence(productImage.getImageSequence())) {
             // 수정이 필요하지 않은 이미지일 경우
             return ImageStatus.STAY;
         }
-        if(!command.getAllImagePath().contains(productImage.getImgPath())) {
+        if(!command.isContainImagePath(productImage.getImgPath())) {
             // 삭제해야하는 이미지일 경우
             return ImageStatus.DELETE;
         }
-        return null;
+        return ImageStatus.ADD;
     }
 
     private boolean isOptionExist() { return !ObjectUtils.isEmpty(this.options); }
