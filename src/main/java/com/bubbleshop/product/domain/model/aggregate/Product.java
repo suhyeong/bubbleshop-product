@@ -131,7 +131,7 @@ public class Product extends TimeEntity implements Serializable {
     }
 
     public List<String> getImageNameToDelete(List<Integer> sequenceList) {
-        return this.images.stream().filter(image -> !sequenceList.contains(image.getImageSequence())).map(ProductImage::getImgPath).collect(Collectors.toList());
+        return this.images.stream().filter(image -> !sequenceList.contains(image.getImageSequence())).map(ProductImage::getImgPath).toList();
     }
 
     /**
@@ -146,7 +146,7 @@ public class Product extends TimeEntity implements Serializable {
         Map<String, List<String>> map = new HashMap<>();
 
         if(!command.existModifyImage()) {
-            List<String> deleteList = this.images.stream().map(ProductImage::getImgPath).collect(Collectors.toList());
+            List<String> deleteList = this.images.stream().map(ProductImage::getImgPath).toList();
             map.put(ImageStatus.DELETE, deleteList);
             this.images.clear();
             return map;
@@ -157,14 +157,14 @@ public class Product extends TimeEntity implements Serializable {
 
         if(ObjectUtils.isEmpty(this.images)) {
             this.createProductImages(thumbnailImageName, detailImageNames);
-            map.put(ImageStatus.ADD, command.getAllImagePath());
+            map.put(ImageStatus.ADD, command.getAllImagePath().stream().toList());
             return map;
         }
 
         // 새 이미지 정보를 담는 리스트 분리
         this.images.forEach(image -> {
             String originImageStatus = this.getImageStatusForModify(command, image);
-            if(originImageStatus != null) {
+            if(!ObjectUtils.isEmpty(originImageStatus)) {
                 List<String> imgList = map.getOrDefault(originImageStatus, new ArrayList<>());
                 imgList.add(image.getImgPath());
                 map.put(originImageStatus, imgList);

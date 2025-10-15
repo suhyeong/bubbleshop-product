@@ -10,5 +10,5 @@ public class CreateCategoryReqDto {
     private String categoryName;
     private String categoryEngName;
     private String categoryType;
-    private boolean isShow;
+    private Boolean isShow;
 }

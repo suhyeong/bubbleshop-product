@@ -10,7 +10,7 @@ public class YOrNToBooleanConverter implements AttributeConverter<Boolean, Strin
 
     @Override
     public String convertToDatabaseColumn(Boolean attribute) {
-        return !ObjectUtils.isEmpty(attribute) && attribute ? StaticValues.COMMON_Y : StaticValues.COMMON_N;
+        return !ObjectUtils.isEmpty(attribute) && Boolean.TRUE.equals(attribute) ? StaticValues.COMMON_Y : StaticValues.COMMON_N;
     }
 
     @Override

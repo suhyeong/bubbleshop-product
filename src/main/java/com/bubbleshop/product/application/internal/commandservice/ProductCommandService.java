@@ -6,6 +6,7 @@ import com.bubbleshop.exception.ApiException;
 import com.bubbleshop.product.domain.command.CreateProductCommand;
 import com.bubbleshop.product.domain.command.ModifyProductCommand;
 import com.bubbleshop.product.domain.model.aggregate.Product;
+import com.bubbleshop.product.domain.model.entity.ProductImage;
 import com.bubbleshop.product.domain.model.event.CreatedProductEvent;
 import com.bubbleshop.product.domain.model.event.DeletedProductEvent;
 import com.bubbleshop.product.domain.repository.CategoryRepository;
@@ -33,10 +34,13 @@ public class ProductCommandService {
     }
 
     public void createProduct(CreateProductCommand command) {
+        // 카테고리 정보 체크
         this.checkCategory(command.getMainCategoryCode(), command.getSubCategoryCode());
         int count = productRepository.countByMainCategoryCodeAndSubCategoryCode(command.getMainCategoryCode(), command.getSubCategoryCode());
+        // 상품 엔티티 생성
         Product product = new Product(command, count+1);
-        s3BucketService.moveProductImagesFromTemp(product);
+        // 이미지 파일 경로 이동
+        s3BucketService.moveProductImagesFromTemp(product.getProductCode(), product.getImages().stream().map(ProductImage::getImgPath).toList());
         productRepository.save(product);
         eventPublisher.publishEvent(new CreatedProductEvent(product));
     }

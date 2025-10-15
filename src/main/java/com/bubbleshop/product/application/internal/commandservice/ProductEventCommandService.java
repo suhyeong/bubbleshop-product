@@ -16,7 +16,7 @@ public class ProductEventCommandService {
     private final S3BucketService s3BucketService;
 
     private List<String> getProductImagesPath(Product product) {
-        return product.getImages().stream().map(ProductImage::getImgPath).collect(Collectors.toList());
+        return product.getImages().stream().map(ProductImage::getImgPath).toList();
     }
 
     public void deleteProductTempImages(Product product) {
