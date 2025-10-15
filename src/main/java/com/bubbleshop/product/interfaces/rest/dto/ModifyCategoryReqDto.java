@@ -9,5 +9,5 @@ public class ModifyCategoryReqDto {
     private String categoryName;
     private String categoryEngName;
     private String categoryType;
-    private boolean isShow;
+    private Boolean isShow;
 }

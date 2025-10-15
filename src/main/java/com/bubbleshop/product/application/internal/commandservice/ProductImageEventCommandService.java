@@ -23,10 +23,10 @@ public class ProductImageEventCommandService {
      */
     public void cleanUpProductImageInfo(String productCode, Map<String, List<String>> images) {
         if(images.containsKey(StaticValues.ImageStatus.ADD)) {
-            s3BucketService.deleteS3Images(StaticValues.S3_TEMP_FOLDER, images.get(StaticValues.ImageStatus.ADD));
+            s3BucketService.deleteS3Images(String.format("%s/", StaticValues.S3_TEMP_FOLDER), images.get(StaticValues.ImageStatus.ADD));
         }
         if(images.containsKey(StaticValues.ImageStatus.DELETE)) {
-            s3BucketService.deleteS3Images(productCode + "/", images.get(StaticValues.ImageStatus.DELETE));
+            s3BucketService.deleteS3Images(String.format("%s/", productCode), images.get(StaticValues.ImageStatus.DELETE));
         }
     }
 }

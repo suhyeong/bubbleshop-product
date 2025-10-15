@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Getter
@@ -47,8 +48,8 @@ public class ModifyProductImageCommand {
         return this.images.stream().filter(ProductImage::isDetailImage).map(ProductImage::getPath).collect(Collectors.toList());
     }
 
-    public List<String> getAllImagePath() {
-        return this.images.stream().map(ProductImage::getPath).collect(Collectors.toList());
+    public Set<String> getAllImagePath() {
+        return this.images.stream().map(ProductImage::getPath).collect(Collectors.toSet());
     }
 
     public boolean isContainImagePath(String path) {
