@@ -13,11 +13,22 @@ Mysql(v5.7) Redis(v7.2.5) AWS S3(v3.5.0)
 make container-up
 ```
 #### 2. resources > db > container > schema_initialize.sql 수행
+- 로컬 DB URL
+```
+jdbc:mysql://localhost:3306/product
+```
+- 로컬 DB Root Auth
+```
+user : root
+password : welcome
+```
 ![schema_initialize](https://github.com/user-attachments/assets/6f7e183d-50bf-47a0-a752-c1935062464b)
+
 #### 3. resources > db > container > create-bucket.sh 수행
 ![create-bucket](https://github.com/user-attachments/assets/932c9aa8-984f-41ae-b433-a8b8a586785c)
+> ***command not found : aws*** 에러 발생시 AWS CLI 다운로드 (다운로드 방법 참고 [AWS CLI Download Docs](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-version.html))
 
-
+---
 <details>
 <summary>Reference Documentation</summary>
 
