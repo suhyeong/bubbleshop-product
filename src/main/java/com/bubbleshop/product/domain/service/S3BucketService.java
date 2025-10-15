@@ -34,11 +34,10 @@ public class S3BucketService {
     private String bucketName;
 
     public String putTempImage(MultipartFile multipartFile) {
-        String fileName = multipartFile.getOriginalFilename();
         String contentType = multipartFile.getContentType();
 
-        fileName = UUID.randomUUID().toString();
-        String key = StaticValues.S3_TEMP_FOLDER + fileName; //임시 폴더에 저장하기 위해 temp/ 붙여주기
+        String randomName = UUID.randomUUID().toString();
+        String key = String.format("%s/%s", StaticValues.S3_TEMP_FOLDER, randomName); //임시 폴더에 저장하기 위해 temp/ 붙여주기
 
         // S3 에 업로드
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
@@ -54,7 +53,7 @@ public class S3BucketService {
             if(!response.sdkHttpResponse().isSuccessful()) //성공이 아닐 경우 throw exception
                 throw new IOException();
 
-            return fileName;
+            return randomName;
         } catch (IOException e) {
             e.printStackTrace();
             throw new ApiException(ResponseCode.S3_PUT_DATA_ERROR);
@@ -71,17 +70,19 @@ public class S3BucketService {
             });
             return uploadedKeys;
         } catch (Exception e) {
-            this.deleteS3Images(StaticValues.S3_TEMP_FOLDER, uploadedKeys);
+            this.deleteS3Images(String.format("%s/", StaticValues.S3_TEMP_FOLDER), uploadedKeys);
             throw e;
         }
     }
 
-    public void moveProductImagesFromTemp(Product product) {
-        String productCode = product.getProductCode();
-        List<String> imageNames = product.getImages().stream().map(ProductImage::getImgPath).collect(Collectors.toList());
-        this.moveProductImagesFromTemp(productCode, imageNames);
-    }
-
+    /**
+     * 상품 이미지를 임시 파일에서 상품 코드 파일로 복사한다.
+     *
+     * 1. temp/{파일명} 의 이미지를 {상품 코드}/{파일명} 으로 복사한다.
+     * 2. 실패하였을 경우 이전에 복사에 성공한 이미지들을 전부 삭제한다.
+     * @param productCode
+     * @param imagesPath
+     */
     public void moveProductImagesFromTemp(String productCode, List<String> imagesPath) {
         List<String> uploadedKeys = new ArrayList<>(); // 중간에 실패하였을 경우 롤백을 위한 Key 리스트
 
@@ -97,10 +98,11 @@ public class S3BucketService {
     }
 
     private String copyProductImageFromTemp(String productCode, String fileName) {
-        String destinationKey = productCode + "/" + fileName;
+        String sourceKey = String.format("%s/%s", StaticValues.S3_TEMP_FOLDER, fileName);
+        String destinationKey = String.format("%s/%s", productCode, fileName);
         CopyObjectRequest copyReq = CopyObjectRequest.builder()
                 .sourceBucket(bucketName)
-                .sourceKey(StaticValues.S3_TEMP_FOLDER + fileName)
+                .sourceKey(sourceKey)
                 .destinationBucket(bucketName)
                 .destinationKey(destinationKey)
                 .build();
@@ -110,7 +112,7 @@ public class S3BucketService {
         if(!response.sdkHttpResponse().isSuccessful()) //성공이 아닐 경우 throw exception
             throw new ApiException(ResponseCode.S3_COPY_DATA_ERROR);
 
-        return destinationKey;
+        return fileName;
     }
 
     public void deleteS3Images(String prefixPath, List<String> keys) {

@@ -13,11 +13,9 @@ import org.mapstruct.ReportingPolicy;
 public abstract class CreateCategoryCommandDTOAssembler {
 
     @Mapping(target = "categoryType", expression = "java( CategoryType.valueOf(reqDto.getCategoryType().toUpperCase()) )")
-    @Mapping(target = "isShow", source = "show")
     public abstract CreateCategoryCommand toCommand(CreateCategoryReqDto reqDto);
 
     @Mapping(target = "categoryCode", source = "categoryCode")
     @Mapping(target = "categoryType", expression = "java( CategoryType.valueOf(reqDto.getCategoryType().toUpperCase()) )")
-    @Mapping(target = "isShow", source = "reqDto.show")
     public abstract ModifyCategoryCommand toCommand(String categoryCode, ModifyCategoryReqDto reqDto);
 }

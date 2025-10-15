@@ -19,7 +19,7 @@ public class StaticValues {
         public static final String localProfile = "default|local";
     }
 
-    public static final String S3_TEMP_FOLDER = "temp/";
+    public static final String S3_TEMP_FOLDER = "temp";
 
     public static class ImageStatus {
         public static final String STAY = "STAY";
