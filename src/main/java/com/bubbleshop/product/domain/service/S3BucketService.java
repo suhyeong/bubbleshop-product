@@ -37,7 +37,8 @@ public class S3BucketService {
         String contentType = multipartFile.getContentType();
 
         String randomName = UUID.randomUUID().toString();
-        String key = String.format("%s/%s", StaticValues.S3_TEMP_FOLDER, randomName); //임시 폴더에 저장하기 위해 temp/ 붙여주기
+        //임시 폴더에 저장하기 위해 temp/ 붙여주기
+        String key = String.format(StaticValues.STRING_FORMAT_SLASH, StaticValues.S3_TEMP_FOLDER, randomName);
 
         // S3 에 업로드
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
@@ -92,14 +93,14 @@ public class S3BucketService {
                 uploadedKeys.add(key);
             });
         } catch (Exception e) {
-            this.deleteS3Images(productCode + "/", uploadedKeys);
+            this.deleteS3Images(String.format("%s/", productCode), uploadedKeys);
             throw e;
         }
     }
 
     private String copyProductImageFromTemp(String productCode, String fileName) {
-        String sourceKey = String.format("%s/%s", StaticValues.S3_TEMP_FOLDER, fileName);
-        String destinationKey = String.format("%s/%s", productCode, fileName);
+        String sourceKey = String.format(StaticValues.STRING_FORMAT_SLASH, StaticValues.S3_TEMP_FOLDER, fileName);
+        String destinationKey = String.format(StaticValues.STRING_FORMAT_SLASH, productCode, fileName);
         CopyObjectRequest copyReq = CopyObjectRequest.builder()
                 .sourceBucket(bucketName)
                 .sourceKey(sourceKey)
