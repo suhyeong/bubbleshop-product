@@ -83,6 +83,9 @@ cloud:
       region: ap-east-1
       bucket-name: product
 
+jwt:
+  secret-key: GfXz4pl0WLO/4Dd9OuqUplp7Gogiz6sGMAvU616OFaflZ83xiE2lYnwrGRPd5N5G # TODO AWS secret manager
+
 #  circuitbreaker:
 #    enabled: true
 #  circuitbreaker:
@@ -145,6 +148,9 @@ cloud:
   aws:
     s3:
       bucket-name: product
+
+jwt:
+  secret-key: GfXz4pl0WLO/4Dd9OuqUplp7Gogiz6sGMAvU616OFaflZ83xiE2lYnwrGRPd5N5G # TODO AWS secret manager
 ---
 # 개발
 spring:
