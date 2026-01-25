@@ -27,4 +27,9 @@ public class StaticValues {
         public static final String DELETE = "DELETE";
         public static final String ADD = "NEW";
     }
+
+    public static class Token {
+        public static final String CLAIM_ROLE_KEY = "role";
+        public static final String ACCESS_TOKEN = "access_token";
+    }
 }
