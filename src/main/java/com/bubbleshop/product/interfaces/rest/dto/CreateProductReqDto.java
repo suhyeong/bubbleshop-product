@@ -27,4 +27,6 @@ public class CreateProductReqDto {
     private List<ModifyProductPointReqDto> points;
     private String thumbnailImageName;
     private List<String> detailImageName;
+    private String displayStartDate;
+    private String displayEndDate;
 }

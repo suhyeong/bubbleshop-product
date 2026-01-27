@@ -3,6 +3,7 @@ package com.bubbleshop.product.domain.model.aggregate;
 import com.bubbleshop.product.domain.command.CreateProductCommand;
 import com.bubbleshop.product.domain.command.ModifyProductCommand;
 import com.bubbleshop.product.domain.command.ModifyProductImageCommand;
+import com.bubbleshop.product.domain.constant.FeatureType;
 import com.bubbleshop.product.domain.constant.PointType;
 import com.bubbleshop.product.domain.constant.ProductImageCode;
 import com.bubbleshop.product.domain.model.converter.YOrNToBooleanConverter;
@@ -16,6 +17,7 @@ import org.springframework.util.ObjectUtils;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -59,28 +61,36 @@ public class Product extends TimeEntity implements Serializable {
 
     @Description("할인율")
     @Column(name = "disc_rate")
-    private int discount_rate;
+    private int discountRate;
 
     @Description("판매 여부")
     @Convert(converter = YOrNToBooleanConverter.class)
     @Column(name = "sale_yn")
     private boolean isSale;
 
+    @Description("전시 시작일")
+    @Column(name = "display_start_dt")
+    private LocalDateTime displayStartDate;
+
+    @Description("전시 종료일")
+    @Column(name = "display_end_dt")
+    private LocalDateTime displayEndDate;
+
     @OneToMany(mappedBy = "product", targetEntity = ProductImage.class, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties({"product"})
-    private final List<ProductImage> images = new ArrayList<>();
+    private List<ProductImage> images = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties({"product"})
-    private final List<ProductOption> options = new ArrayList<>();
+    private List<ProductOption> options = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", targetEntity = ProductFeature.class, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties({"product"})
-    private final List<ProductFeature> features = new ArrayList<>();
+    private List<ProductFeature> features = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", targetEntity = ProductPoint.class, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties({"product"})
-    private final List<ProductPoint> points = new ArrayList<>();
+    private List<ProductPoint> points = new ArrayList<>();
 
     public Product(CreateProductCommand command, int sequence) {
         this.productCode = command.getMainCategoryCode() + command.getSubCategoryCode() + String.format("%05d", sequence);
@@ -90,9 +100,9 @@ public class Product extends TimeEntity implements Serializable {
         this.subCategoryCode = command.getSubCategoryCode();
         this.cost = command.getPrice();
         this.isSale = false;
-        if(Objects.nonNull(command.getFeatureTypes()) && !command.getFeatureTypes().isEmpty()) {
-            command.getFeatureTypes().forEach(featureType -> this.features.add(new ProductFeature(this.productCode, featureType)));
-        }
+        this.displayStartDate = command.getDisplayStartDate();
+        this.displayEndDate = command.getDisplayEndDate();
+        this.createProductFeatures(command.getFeatureTypes());
         this.createProductImages(command.getThumbnailImageName(), command.getDetailImageName());
         this.createProductOptions(command.getOptionName(), command.getDefaultOptionName());
         this.createProductPoints(command.getPoints());
@@ -116,18 +126,52 @@ public class Product extends TimeEntity implements Serializable {
         }
     }
 
-    public void modifyProduct(ModifyProductCommand command) {
-        this.productName = command.getName();
-        this.productEngName = command.getEngName();
-        this.cost = command.getPrice();
-        this.discount_rate = command.getDiscount();
-        this.isSale = command.isSale();
-        if(Objects.nonNull(command.getFeatureTypes()) && !command.getFeatureTypes().isEmpty()) {
-            this.features.clear();
-            command.getFeatureTypes().forEach(featureType -> this.features.add(new ProductFeature(this.productCode, featureType)));
+    private void createProductFeatures(Set<FeatureType> featureTypes) {
+        if(Objects.nonNull(featureTypes) && !featureTypes.isEmpty()) {
+            featureTypes.forEach(featureType -> {
+                ProductFeature productFeature = new ProductFeature(this);
+                productFeature.applyFeatureType(featureType);
+                this.features.add(productFeature);
+            });
         }
-        this.modifyProductOptions(command.getOptions());
-        this.modifyProductPoints(command.getPoints());
+    }
+
+    private void modifyProductFeatures(Set<FeatureType> featureTypes) {
+        if(Objects.nonNull(featureTypes) && !featureTypes.isEmpty()) {
+            Map<FeatureType, ProductFeature> existingFeatures = this.features.stream()
+                    .collect(Collectors.toMap(o -> o.getProductFeatureId().getFeatureType(), o -> o));
+
+            featureTypes.forEach(featureType -> {
+                // 기존에 있는 태그면 패스, 없는 태그일 경우만 새 데이터 생성
+                if(!existingFeatures.containsKey(featureType)) {
+                    ProductFeature productFeature = new ProductFeature(this);
+                    productFeature.applyFeatureType(featureType);
+                    this.features.add(productFeature);
+                }
+            });
+        } else {
+            // 전체 삭제
+            this.features.clear();
+        }
+    }
+
+    public void modifyProduct(ModifyProductCommand command) {
+        // 상품이 FO 노출중 (상품 판매중) 일 경우 수정할 수 있는 판매여부, 옵션 재고, 태그만 수정
+        this.isSale = command.isSale();
+        this.modifyProductFeatures(command.getFeatureTypes());
+        if(Objects.nonNull(command.getOptions()) && !command.getOptions().isEmpty()) {
+            this.modifyProductOptions(command.getOptions());
+        }
+
+        if (!command.isShowProduct()) {
+            this.productName = command.getName();
+            this.productEngName = command.getEngName();
+            this.cost = command.getPrice();
+            this.discountRate = command.getDiscount();
+            this.modifyProductPoints(command.getPoints());
+            this.displayStartDate = command.getDisplayStartDate();
+            this.displayEndDate = command.getDisplayEndDate();
+        }
     }
 
     public List<String> getImageNameToDelete(List<Integer> sequenceList) {

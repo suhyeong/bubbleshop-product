@@ -10,7 +10,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "product_points_master")
+@Table(name = "product_point_master")
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor

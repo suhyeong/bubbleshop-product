@@ -7,17 +7,21 @@ import com.bubbleshop.product.domain.constant.ProductImageCode;
 import com.bubbleshop.product.interfaces.rest.dto.ModifyProductOptionReqDto;
 import com.bubbleshop.product.interfaces.rest.dto.ModifyProductPointReqDto;
 import com.bubbleshop.product.interfaces.rest.dto.ModifyProductReqDto;
+import com.bubbleshop.util.DateTimeUtils;
 import org.mapstruct.*;
 
 import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR, imports = {PointType.class})
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.ERROR, imports = {PointType.class, DateTimeUtils.class})
 public abstract class ModifyProductCommandDTOAssembler {
 
     @Mappings({
+            @Mapping(target = "isShowProduct", source = "reqDto.isShowProduct"),
             @Mapping(target = "options", source = "reqDto.options", qualifiedByName = "ModifyProductCommand.Set<ProductOption>"),
             @Mapping(target = "points", source = "reqDto.points", qualifiedByName = "ModifyProductCommand.Set<ProductPoint>"),
-            @Mapping(target = "featureTypes", ignore = true)
+            @Mapping(target = "featureTypes", ignore = true),
+            @Mapping(target = "displayStartDate", expression = "java( DateTimeUtils.convertStringToLocalDateTime(reqDto.getDisplayStartDate()) )"),
+            @Mapping(target = "displayEndDate", expression = "java( DateTimeUtils.convertStringToLocalDateTime(reqDto.getDisplayEndDate()) )")
     })
     public abstract ModifyProductCommand toCommand(String productCode, ModifyProductReqDto reqDto);
 

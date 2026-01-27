@@ -12,6 +12,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
+
+import java.io.Serial;
 import java.io.Serializable;
 
 @Entity
@@ -21,6 +23,9 @@ import java.io.Serializable;
 @Getter
 @Builder
 public class Category extends TimeEntity implements Serializable {
+    @Serial
+    private static final long serialVersionUID = -618759293552878914L;
+
     @Id
     @Description("카테고리 코드")
     @Column(name = "cate_code")

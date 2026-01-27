@@ -1,6 +1,5 @@
 package com.bubbleshop.product.domain.model.view;
 
-import com.bubbleshop.product.domain.constant.PointType;
 import com.bubbleshop.product.domain.model.aggregate.Category;
 import com.bubbleshop.product.domain.model.aggregate.Product;
 import com.bubbleshop.util.DateTimeUtils;
@@ -10,10 +9,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static com.bubbleshop.util.DateTimeUtils.DATE_FORMAT_YYYY_MM_DD_DOT;
 
@@ -35,6 +33,8 @@ public class ProductView {
     private int price;
     private int discountRate;
     private Boolean isSale;
+    private LocalDateTime displayStartDate;
+    private LocalDateTime displayEndDate;
 
     private List<ProductImageView> imageList;
     private List<ProductFeatureView> featureTypes;
@@ -52,8 +52,10 @@ public class ProductView {
         this.subCategoryCode = product.getSubCategoryCode();
         this.subCategoryName = subCategory.getName();
         this.price = product.getCost();
-        this.discountRate = product.getDiscount_rate();
+        this.discountRate = product.getDiscountRate();
         this.isSale = product.isSale();
+        this.displayStartDate = product.getDisplayStartDate();
+        this.displayEndDate = product.getDisplayEndDate();
 
         this.featureTypes = new ArrayList<>();
         product.getFeatures().forEach(feature -> featureTypes.add(new ProductFeatureView(feature)));

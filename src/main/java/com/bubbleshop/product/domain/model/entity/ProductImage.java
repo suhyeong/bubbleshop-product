@@ -12,7 +12,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "product_img_mng")
+@Table(name = "product_image_master")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter

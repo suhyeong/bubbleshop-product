@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.apache.commons.lang3.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -28,6 +29,8 @@ public class CreateProductCommand {
     private String thumbnailImageName;
     private List<String> detailImageName;
     private Set<ProductPoint> points;
+    private LocalDateTime displayStartDate;
+    private LocalDateTime displayEndDate;
 
     @Builder
     @Getter

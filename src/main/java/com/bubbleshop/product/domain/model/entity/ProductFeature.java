@@ -24,12 +24,18 @@ public class ProductFeature extends TimeEntity implements Serializable {
     @EmbeddedId
     private ProductFeatureId productFeatureId;
 
+    @MapsId("productCode")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_code", insertable = false, updatable = false)
+    @JoinColumn(name = "product_code")
     @ToString.Exclude
     private Product product;
 
-    public ProductFeature(String productCode, FeatureType featureType) {
-        this.productFeatureId = new ProductFeatureId(productCode, featureType);
+    public ProductFeature(Product product) {
+        this.product = product;
+        this.productFeatureId = new ProductFeatureId();
+    }
+
+    public void applyFeatureType(FeatureType featureType) {
+        this.productFeatureId.applyFeatureType(featureType);
     }
 }
