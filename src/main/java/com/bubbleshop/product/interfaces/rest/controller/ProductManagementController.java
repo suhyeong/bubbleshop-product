@@ -87,7 +87,7 @@ public class ProductManagementController extends BaseController {
 
     @Operation(summary = "단건 상품 조회 API", description = "상품 코드로 상품 정보를 조회한다.")
     @GetMapping(PRODUCT)
-    public ResponseEntity<Object> getProduct(@PathVariable String productId) {
+    public ResponseEntity<GetProductRspDto> getProduct(@PathVariable String productId) {
         ProductView product = productQueryService.getProduct(productId);
         GetProductRspDto rspDto = getProductCommandDTOAssembler.toPrdRspDto(product);
         return ResponseEntity.ok()

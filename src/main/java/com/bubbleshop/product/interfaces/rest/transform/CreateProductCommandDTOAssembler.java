@@ -1,6 +1,7 @@
 package com.bubbleshop.product.interfaces.rest.transform;
 
 import com.bubbleshop.product.domain.command.CreateProductCommand;
+import com.bubbleshop.product.domain.command.CreateProductPointCommand;
 import com.bubbleshop.product.domain.constant.FeatureType;
 import com.bubbleshop.product.domain.constant.PointType;
 import com.bubbleshop.product.interfaces.rest.dto.CreateProductReqDto;
@@ -27,7 +28,7 @@ public abstract class CreateProductCommandDTOAssembler {
 
     @Named("CreateProductCommand.Set<ProductPoint>")
     @Mapping(target = "productType", expression = "java( PointType.find(reqDto.getPointTypeCode()) )")
-    public abstract CreateProductCommand.ProductPoint toPointCommand(ModifyProductPointReqDto reqDto);
+    public abstract CreateProductPointCommand toPointCommand(ModifyProductPointReqDto reqDto);
 
     @AfterMapping
     protected void afterMappingToCommand(

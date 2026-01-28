@@ -9,13 +9,13 @@ import lombok.*;
 @NoArgsConstructor
 @ToString
 public class ProductImageView {
-    private int imageSequence;
+    private Long id;
     private String imageDivCode;
     private String imagePath;
     private String imageFullPath;
 
     public ProductImageView(ProductImage productImage) {
-        this.imageSequence = productImage.getImageSequence();
+        this.id = productImage.getId();
         this.imageDivCode = productImage.getImageDivCode();
         this.imagePath = productImage.getImgPath();
     }

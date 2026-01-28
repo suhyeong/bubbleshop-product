@@ -44,7 +44,8 @@ class ProductImageCommandServiceTest {
     void modifyProductImages_all_img_delete() {
         //given
         ProductImage image1 = ProductImage.builder()
-                .productImageId(new ProductImageId("001", ProductImageCode.THUMBNAIL_IMAGE, 1))
+                .id(1L)
+                .divCode(ProductImageCode.THUMBNAIL_IMAGE)
                 .imgPath("path1")
                 .build();
         Product product = ProductMockData.createProduct("001", new ArrayList<>(List.of(image1)));
@@ -52,6 +53,7 @@ class ProductImageCommandServiceTest {
 
         ModifyProductImageCommand command = ModifyProductImageCommand.builder()
                 .productCode("001")
+                .images(List.of())
                 .build();
 
         //when
@@ -88,7 +90,8 @@ class ProductImageCommandServiceTest {
     void modifyProductImages_modify_image() {
         //given
         ProductImage image1 = ProductImage.builder()
-                .productImageId(new ProductImageId("001", ProductImageCode.THUMBNAIL_IMAGE, 1))
+                .id(1L)
+                .divCode(ProductImageCode.THUMBNAIL_IMAGE)
                 .imgPath("path1")
                 .build();
         Product product = ProductMockData.createProduct("001", new ArrayList<>(List.of(image1)));

@@ -39,26 +39,26 @@ public class ProductOption extends TimeEntity implements Serializable {
     @Embedded
     private Stock stock;
 
+    @MapsId("productCode")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_code", insertable = false, updatable = false)
+    @JoinColumn(name = "product_code")
     @ToString.Exclude
     private Product product;
 
-    public ProductOption(String productCode, int sequence,
-                         String optionName, boolean isDefaultOption) {
-        this.productOptionId = new ProductOptionId(productCode, sequence);
-        this.optionName = optionName;
-        this.isDefaultOption = isDefaultOption;
+    public ProductOption(Product product) {
+        this.product = product;
+        this.productOptionId = new ProductOptionId();
         this.stock = new Stock();
     }
 
-    public ProductOption(String productCode, int sequence,
-                         String optionName, boolean isDefaultOption, int stock) {
-        this(productCode, sequence, optionName, isDefaultOption);
-        this.stock.applyStockCount(stock);
+    public void setProductOption(int sequence, String optionName, boolean isDefaultOption, int stock) {
+        this.productOptionId.setProductOptionSeq(sequence);
+        this.setProductOption(optionName, isDefaultOption, stock);
     }
 
-    public int getOptionSequence() {
-        return this.productOptionId.getProductOptionSeq();
+    public void setProductOption(String optionName, boolean isDefaultOption, int stock) {
+        this.optionName = optionName;
+        this.isDefaultOption = isDefaultOption;
+        this.stock.applyStockCount(stock);
     }
 }

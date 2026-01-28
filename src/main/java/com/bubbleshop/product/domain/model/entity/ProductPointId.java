@@ -29,4 +29,8 @@ public class ProductPointId implements Serializable {
     @Column(name = "point_code")
     @Convert(converter = ProductPointTypeConverter.class)
     private PointType pointType;
+
+    public void setPointType(PointType pointType) {
+        this.pointType = pointType;
+    }
 }

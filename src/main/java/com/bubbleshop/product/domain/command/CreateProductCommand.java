@@ -28,18 +28,9 @@ public class CreateProductCommand {
     private String defaultOptionName;
     private String thumbnailImageName;
     private List<String> detailImageName;
-    private Set<ProductPoint> points;
+    private Set<CreateProductPointCommand> points;
     private LocalDateTime displayStartDate;
     private LocalDateTime displayEndDate;
-
-    @Builder
-    @Getter
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class ProductPoint {
-        private PointType productType;
-        private int savePoint;
-    }
 
     public boolean isThumbnailImageExist() {
         return StringUtils.isNotBlank(this.thumbnailImageName);

@@ -25,7 +25,7 @@ public class ModifyProductCommand {
     private int discount;
     private boolean isSale;
     private Set<ProductOption> options;
-    private Set<ProductPoint> points;
+    private Set<CreateProductPointCommand> points;
 
     private LocalDateTime displayStartDate;
     private LocalDateTime displayEndDate;
@@ -39,14 +39,5 @@ public class ModifyProductCommand {
         private String name;
         private int stockCnt;
         private boolean isDefaultOption;
-    }
-
-    @Builder
-    @Getter
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class ProductPoint {
-        private PointType productType;
-        private int savePoint;
     }
 }

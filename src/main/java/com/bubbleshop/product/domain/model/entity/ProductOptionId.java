@@ -25,4 +25,8 @@ public class ProductOptionId implements Serializable {
     @Description("옵션 순번")
     @Column(name = "product_opt_seq")
     private int productOptionSeq;
+
+    public void setProductOptionSeq(int seq) {
+        this.productOptionSeq = seq;
+    }
 }

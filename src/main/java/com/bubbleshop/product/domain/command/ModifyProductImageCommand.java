@@ -3,62 +3,15 @@ package com.bubbleshop.product.domain.command;
 import com.bubbleshop.product.domain.constant.ProductImageCode;
 import lombok.Builder;
 import lombok.Getter;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Getter
 @Builder
 public class ModifyProductImageCommand {
     private String productCode;
     private List<ProductImage> images;
-
-    public boolean existModifyImage() {
-        return Objects.nonNull(this.images) && !this.images.isEmpty();
-    }
-
-    /**
-     * 시퀀스가 동일한 데이터가 있는지 체크
-     * @param imageSequence
-     * @return
-     */
-    public boolean isContainImageSequence(int imageSequence) {
-        for(ProductImage item : this.images) {
-            if(Objects.nonNull(item.getSequence()) && item.getSequence() == imageSequence)
-                return true;
-        }
-        return false;
-    }
-
-    public List<String> getAddImagePath() {
-        return this.images.stream().filter(item -> item.getSequence() == null)
-                .map(ProductImage::getPath).collect(Collectors.toList());
-    }
-
-    public String getThumbnailImagePath() {
-        Optional<ProductImage> image = this.images.stream().filter(ProductImage::isThumbnailImage).findFirst();
-        return image.isPresent() ? image.get().getPath() : StringUtils.EMPTY;
-    }
-
-    public List<String> getDetailImagePath() {
-        return this.images.stream().filter(ProductImage::isDetailImage).map(ProductImage::getPath).collect(Collectors.toList());
-    }
-
-    public Set<String> getAllImagePath() {
-        return this.images.stream().map(ProductImage::getPath).collect(Collectors.toSet());
-    }
-
-    public boolean isContainImagePath(String path) {
-        for(ProductImage item : this.images) {
-            if(Objects.nonNull(item.getPath()) && item.getPath().equals(path))
-                return true;
-        }
-        return false;
-    }
 
     /**
      * sequence 가 Null 인 경우 : 새 이미지
@@ -67,16 +20,10 @@ public class ModifyProductImageCommand {
     @Getter
     @Builder
     public static class ProductImage {
-        private Integer sequence;
+        private Long id;
         private ProductImageCode imageDivCode;
         private String path;
 
-        private boolean isThumbnailImage() {
-            return this.imageDivCode.equals(ProductImageCode.THUMBNAIL_IMAGE);
-        }
-
-        private boolean isDetailImage() {
-            return this.imageDivCode.equals(ProductImageCode.FULL_DETAIL_IMAGE);
-        }
+        public boolean isNewImage() { return Objects.isNull(this.id); }
     }
 }

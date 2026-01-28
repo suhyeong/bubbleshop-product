@@ -1,6 +1,7 @@
 package com.bubbleshop.product.domain.model.aggregate;
 
 import com.bubbleshop.product.domain.command.CreateProductCommand;
+import com.bubbleshop.product.domain.command.CreateProductPointCommand;
 import com.bubbleshop.product.domain.command.ModifyProductCommand;
 import com.bubbleshop.product.domain.command.ModifyProductImageCommand;
 import com.bubbleshop.product.domain.constant.FeatureType;
@@ -29,7 +30,7 @@ import static com.bubbleshop.constants.StaticValues.ImageStatus;
 @AllArgsConstructor
 @ToString
 @Getter
-@Builder
+@Builder(toBuilder = true)
 public class Product extends TimeEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = -4203406260459802808L;
@@ -105,35 +106,49 @@ public class Product extends TimeEntity implements Serializable {
         this.createProductFeatures(command.getFeatureTypes());
         this.createProductImages(command.getThumbnailImageName(), command.getDetailImageName());
         this.createProductOptions(command.getOptionName(), command.getDefaultOptionName());
-        this.createProductPoints(command.getPoints());
+        command.getPoints().forEach(this::createProductPoint);
     }
 
     private void createProductImages(String thumbnailImageName, List<String> detailImageName) {
         if(StringUtils.isNotBlank(thumbnailImageName))
-            this.images.add(new ProductImage(this, ProductImageCode.THUMBNAIL_IMAGE, thumbnailImageName, this.images.size() + 1));
+            this.images.add(new ProductImage(this, ProductImageCode.THUMBNAIL_IMAGE, thumbnailImageName));
         if(Objects.nonNull(detailImageName) && !detailImageName.isEmpty()) {
             detailImageName.forEach(name ->
-                this.images.add(new ProductImage(this, ProductImageCode.FULL_DETAIL_IMAGE, name, this.images.size() + 1)));
+                this.images.add(new ProductImage(this, ProductImageCode.FULL_DETAIL_IMAGE, name)));
         }
     }
 
     private void createProductOptions(Set<String> productOptions, String defaultOption) {
         if(Objects.nonNull(productOptions) && !productOptions.isEmpty()) {
-            productOptions.forEach(option -> {
-                boolean isDefaultOption = defaultOption.equals(option);
-                this.options.add(new ProductOption(this.productCode, this.options.size() + 1, option, isDefaultOption));
+            productOptions.forEach(optionName -> {
+                boolean isDefaultOption = defaultOption.equals(optionName);
+                this.createProductOption(this.options.size() + 1, optionName, isDefaultOption, 0);
             });
         }
     }
 
+    private void createProductOption(int sequence, String optionName, boolean isDefaultOption, int stock) {
+        ProductOption productOption = new ProductOption(this);
+        productOption.setProductOption(sequence, optionName, isDefaultOption, stock);
+        this.options.add(productOption);
+    }
+
     private void createProductFeatures(Set<FeatureType> featureTypes) {
         if(Objects.nonNull(featureTypes) && !featureTypes.isEmpty()) {
-            featureTypes.forEach(featureType -> {
-                ProductFeature productFeature = new ProductFeature(this);
-                productFeature.applyFeatureType(featureType);
-                this.features.add(productFeature);
-            });
+            featureTypes.forEach(this::createProductFeature);
         }
+    }
+
+    private void createProductFeature(FeatureType featureType) {
+        ProductFeature productFeature = new ProductFeature(this);
+        productFeature.applyFeatureType(featureType);
+        this.features.add(productFeature);
+    }
+
+    private void createProductPoint(CreateProductPointCommand newPoint) {
+        ProductPoint point = new ProductPoint(this);
+        point.setProductPoint(newPoint.getProductType(), newPoint.getSavePoint());
+        this.points.add(point);
     }
 
     private void modifyProductFeatures(Set<FeatureType> featureTypes) {
@@ -144,9 +159,7 @@ public class Product extends TimeEntity implements Serializable {
             featureTypes.forEach(featureType -> {
                 // 기존에 있는 태그면 패스, 없는 태그일 경우만 새 데이터 생성
                 if(!existingFeatures.containsKey(featureType)) {
-                    ProductFeature productFeature = new ProductFeature(this);
-                    productFeature.applyFeatureType(featureType);
-                    this.features.add(productFeature);
+                    this.createProductFeature(featureType);
                 }
             });
         } else {
@@ -159,9 +172,7 @@ public class Product extends TimeEntity implements Serializable {
         // 상품이 FO 노출중 (상품 판매중) 일 경우 수정할 수 있는 판매여부, 옵션 재고, 태그만 수정
         this.isSale = command.isSale();
         this.modifyProductFeatures(command.getFeatureTypes());
-        if(Objects.nonNull(command.getOptions()) && !command.getOptions().isEmpty()) {
-            this.modifyProductOptions(command.getOptions());
-        }
+        this.modifyProductOptions(command.getOptions());
 
         if (!command.isShowProduct()) {
             this.productName = command.getName();
@@ -172,10 +183,6 @@ public class Product extends TimeEntity implements Serializable {
             this.displayStartDate = command.getDisplayStartDate();
             this.displayEndDate = command.getDisplayEndDate();
         }
-    }
-
-    public List<String> getImageNameToDelete(List<Integer> sequenceList) {
-        return this.images.stream().filter(image -> !sequenceList.contains(image.getImageSequence())).map(ProductImage::getImgPath).toList();
     }
 
     /**
@@ -189,86 +196,77 @@ public class Product extends TimeEntity implements Serializable {
     public Map<String, List<String>> modifyProductImages(ModifyProductImageCommand command) {
         Map<String, List<String>> map = new HashMap<>();
 
-        if(!command.existModifyImage()) {
-            List<String> deleteList = this.images.stream().map(ProductImage::getImgPath).toList();
-            map.put(ImageStatus.DELETE, deleteList);
-            this.images.clear();
-            return map;
-        }
+        // 기존 이미지 아이디 Set
+        Set<Long> originIdSet = this.images.stream().map(ProductImage::getId).collect(Collectors.toSet());
 
-        String thumbnailImageName = command.getThumbnailImagePath();
-        List<String> detailImageNames = command.getDetailImagePath();
+        // 요청에 포함된 이미지 아이디 (기존 이미지 아이디) Set
+        Set<Long> requestSet = command.getImages().stream()
+                .map(ModifyProductImageCommand.ProductImage::getId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
 
-        if(ObjectUtils.isEmpty(this.images)) {
-            this.createProductImages(thumbnailImageName, detailImageNames);
-            map.put(ImageStatus.ADD, command.getAllImagePath().stream().toList());
-            return map;
-        }
+        // 삭제할 이미지 찾기 (기존 O 요청 X)
+        Set<Long> deleteSet = new HashSet<>(originIdSet);
+        deleteSet.removeAll(requestSet);
 
-        // 새 이미지 정보를 담는 리스트 분리
-        this.images.forEach(image -> {
-            String originImageStatus = this.getImageStatusForModify(command, image);
-            if(!ObjectUtils.isEmpty(originImageStatus)) {
-                List<String> imgList = map.getOrDefault(originImageStatus, new ArrayList<>());
-                imgList.add(image.getImgPath());
-                map.put(originImageStatus, imgList);
+        // 삭제할 이미지 제거
+        this.images.removeIf(image -> {
+            if(deleteSet.contains(image.getId())) {
+                List<String> deleteItems = map.getOrDefault(ImageStatus.DELETE, new ArrayList<>());
+                deleteItems.add(image.getImgPath());
+                map.put(ImageStatus.DELETE, deleteItems);
+                return true;
             }
+
+            return false;
         });
 
-        map.put(ImageStatus.ADD, command.getAddImagePath());
-        this.images.clear();
-        this.createProductImages(thumbnailImageName, detailImageNames);
+        // 추가할 이미지 생성 (기존 X 요청 O)
+        command.getImages().forEach(item -> {
+            if(item.isNewImage()) {
+                this.images.add(new ProductImage(this, item.getImageDivCode(), item.getPath()));
+                List<String> addItems = map.getOrDefault(ImageStatus.ADD, new ArrayList<>());
+                addItems.add(item.getPath());
+                map.put(ImageStatus.ADD, addItems);
+            }
+        });
 
         return map;
     }
 
-    private String getImageStatusForModify(ModifyProductImageCommand command, ProductImage productImage) {
-        if(command.isContainImageSequence(productImage.getImageSequence())) {
-            // 수정이 필요하지 않은 이미지일 경우
-            return ImageStatus.STAY;
-        }
-        if(!command.isContainImagePath(productImage.getImgPath())) {
-            // 삭제해야하는 이미지일 경우
-            return ImageStatus.DELETE;
-        }
-        return ImageStatus.ADD;
-    }
-
-    private boolean isOptionExist() { return !ObjectUtils.isEmpty(this.options); }
-
-    private boolean isPointExist() { return !ObjectUtils.isEmpty(this.points); }
-
     private void modifyProductOptions(Set<ModifyProductCommand.ProductOption> newProductOptions) {
-        // 기존 옵션이 존재할 경우
-        if(this.isOptionExist()) {
-            // 기존 옵션 삭제
-            this.options.clear();
-        }
+        if(Objects.nonNull(newProductOptions) && !newProductOptions.isEmpty()) {
+            Map<Integer, ProductOption> existingOptions = this.options.stream()
+                    .collect(Collectors.toMap(o -> o.getProductOptionId().getProductOptionSeq(), o -> o));
 
-        // 새 옵션 데이터 매핑
-        newProductOptions.forEach(newOption ->
-                this.options.add(new ProductOption(this.productCode, newOption.getSequence(),
-                        newOption.getName(), newOption.isDefaultOption(), newOption.getStockCnt()))
-        );
-    }
-
-    private void addPoint(PointType pointType, int savePoint) {
-        this.points.add(new ProductPoint(this.productCode, pointType, savePoint));
-    }
-
-    private void modifyProductPoints(Set<ModifyProductCommand.ProductPoint> newPoints) {
-        if(this.isPointExist()) {
-            this.points.clear();
-        }
-
-        for(ModifyProductCommand.ProductPoint point : newPoints) {
-            this.addPoint(point.getProductType(), point.getSavePoint());
+            for(ModifyProductCommand.ProductOption option : newProductOptions) {
+                // 이미 존재하는 옵션일 경우 PK 제외 나머지 값만 업데이트
+                if (existingOptions.containsKey(option.getSequence())) {
+                    ProductOption originOption = existingOptions.get(option.getSequence());
+                    originOption.setProductOption(option.getName(), option.isDefaultOption(), option.getStockCnt());
+                }
+                // 새로운 옵션일 경우 데이터 추가
+                else {
+                    this.createProductOption(option.getSequence(), option.getName(), option.isDefaultOption(), option.getStockCnt());
+                }
+            }
         }
     }
 
-    private void createProductPoints(Set<CreateProductCommand.ProductPoint> newPoints) {
-        for(CreateProductCommand.ProductPoint point : newPoints) {
-            this.addPoint(point.getProductType(), point.getSavePoint());
+    private void modifyProductPoints(Set<CreateProductPointCommand> newPoints) {
+        Map<PointType, ProductPoint> existingPoints = this.points.stream()
+                .collect(Collectors.toMap(o -> o.getProductPointId().getPointType(), o -> o));
+
+        for(CreateProductPointCommand requestPoint : newPoints) {
+            // 이미 있는 포인트 유형일 경우 포인트 값만 수정하도록 처리
+            if (existingPoints.containsKey(requestPoint.getProductType())) {
+                ProductPoint point = existingPoints.get(requestPoint.getProductType());
+                point.setSavePoints(requestPoint.getSavePoint());
+            }
+            // 기존에 없는 포인트 유형일 경우 새로 추가
+            else {
+                this.createProductPoint(requestPoint);
+            }
         }
     }
 }
