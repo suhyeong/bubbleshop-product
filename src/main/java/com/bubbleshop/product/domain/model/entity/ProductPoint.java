@@ -10,7 +10,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "product_points_master")
+@Table(name = "product_point_master")
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
@@ -26,13 +26,23 @@ public class ProductPoint extends TimeEntity implements Serializable {
     @Column(name = "save_points")
     private Integer savePoints;
 
+    @MapsId("productCode")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_code", insertable = false, updatable = false)
+    @JoinColumn(name = "product_code")
     @ToString.Exclude
     private Product product;
 
-    public ProductPoint(String productCode, PointType pointType, int savePoint) {
-        this.productPointId = new ProductPointId(productCode, pointType);
-        this.savePoints = savePoint;
+    public ProductPoint(Product product) {
+        this.product = product;
+        this.productPointId = new ProductPointId();
+    }
+
+    public void setProductPoint(PointType pointType, int savePoint) {
+        this.productPointId.setPointType(pointType);
+        this.setSavePoints(savePoint);
+    }
+
+    public void setSavePoints(int savePoints) {
+        this.savePoints = savePoints;
     }
 }

@@ -14,7 +14,7 @@ public class ModifyProductImageReqDto {
     @Builder
     public static class ImageReqDto {
         private String divCode;
-        private Integer sequence;
+        private Long id;
         private String fileName;
     }
 }

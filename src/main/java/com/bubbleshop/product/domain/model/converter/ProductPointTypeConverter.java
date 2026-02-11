@@ -4,7 +4,7 @@ import com.bubbleshop.product.domain.constant.PointType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.AttributeConverter;
 
-public record ProductPointTypeConverter(ObjectMapper objectMapper) implements AttributeConverter<PointType, String> {
+public class ProductPointTypeConverter implements AttributeConverter<PointType, String> {
 
     @Override
     public String convertToDatabaseColumn(PointType attribute) {

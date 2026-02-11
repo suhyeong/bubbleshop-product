@@ -15,7 +15,6 @@ public class ProductMockData {
                 .subCategoryCode("01")
                 .cost(100000)
                 .images(images)
-                .featureTypes(Set.of())
                 .options(List.of())
                 .build();
     }

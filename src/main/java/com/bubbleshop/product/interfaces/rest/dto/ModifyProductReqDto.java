@@ -14,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @ToString
 public class ModifyProductReqDto {
+    private Boolean isShowProduct;
     private List<String> features;
     private String name;
     private String engName;
@@ -22,4 +23,6 @@ public class ModifyProductReqDto {
     private Boolean isSale;
     private List<ModifyProductOptionReqDto> options;
     private List<ModifyProductPointReqDto> points;
+    private String displayStartDate;
+    private String displayEndDate;
 }

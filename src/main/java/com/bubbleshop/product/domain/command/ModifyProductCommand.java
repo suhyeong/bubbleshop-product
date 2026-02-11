@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Getter
@@ -15,6 +16,7 @@ import java.util.Set;
 @Builder
 public class ModifyProductCommand {
     private String productCode;
+    private boolean isShowProduct;
 
     private String name;
     private String engName;
@@ -23,7 +25,10 @@ public class ModifyProductCommand {
     private int discount;
     private boolean isSale;
     private Set<ProductOption> options;
-    private Set<ProductPoint> points;
+    private Set<CreateProductPointCommand> points;
+
+    private LocalDateTime displayStartDate;
+    private LocalDateTime displayEndDate;
 
     @Builder
     @Getter
@@ -34,14 +39,5 @@ public class ModifyProductCommand {
         private String name;
         private int stockCnt;
         private boolean isDefaultOption;
-    }
-
-    @Builder
-    @Getter
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class ProductPoint {
-        private PointType productType;
-        private int savePoint;
     }
 }

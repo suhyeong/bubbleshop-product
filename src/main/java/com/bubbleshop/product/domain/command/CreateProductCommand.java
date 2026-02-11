@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.apache.commons.lang3.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -27,16 +28,9 @@ public class CreateProductCommand {
     private String defaultOptionName;
     private String thumbnailImageName;
     private List<String> detailImageName;
-    private Set<ProductPoint> points;
-
-    @Builder
-    @Getter
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class ProductPoint {
-        private PointType productType;
-        private int savePoint;
-    }
+    private Set<CreateProductPointCommand> points;
+    private LocalDateTime displayStartDate;
+    private LocalDateTime displayEndDate;
 
     public boolean isThumbnailImageExist() {
         return StringUtils.isNotBlank(this.thumbnailImageName);

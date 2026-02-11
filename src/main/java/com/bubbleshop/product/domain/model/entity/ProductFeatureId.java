@@ -29,4 +29,8 @@ public class ProductFeatureId implements Serializable {
     @Column(name = "feature_code")
     @Convert(converter = ProductFeaturesTypeConverter.class)
     private FeatureType featureType;
+
+    public void applyFeatureType(FeatureType featureType) {
+        this.featureType = featureType;
+    }
 }

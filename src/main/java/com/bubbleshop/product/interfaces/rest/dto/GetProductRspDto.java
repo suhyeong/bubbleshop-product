@@ -24,6 +24,9 @@ public class GetProductRspDto {
     private int discountRate;
     private Boolean isSale;
 
+    private String displayStartDate;
+    private String displayEndDate;
+
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<GetProductImageDetailRspDto> imageList;
 
