@@ -26,6 +26,7 @@ public class GetProductRspDto {
 
     private String displayStartDate;
     private String displayEndDate;
+    private String orderDeadlineDate;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<GetProductImageDetailRspDto> imageList;

@@ -23,6 +23,7 @@ public abstract class CreateProductCommandDTOAssembler {
             @Mapping(target = "points", source = "reqDto.points", qualifiedByName = "CreateProductCommand.Set<ProductPoint>"),
             @Mapping(target = "displayStartDate", ignore = true),
             @Mapping(target = "displayEndDate", ignore = true),
+            @Mapping(target = "orderDeadlineDate", ignore = true),
     })
     public abstract CreateProductCommand toCommand(CreateProductReqDto reqDto);
 
@@ -41,5 +42,6 @@ public abstract class CreateProductCommandDTOAssembler {
         }
         builder.displayStartDate(DateTimeUtils.convertStringToLocalDateTime(reqDto.getDisplayStartDate()));
         builder.displayEndDate(DateTimeUtils.convertStringToLocalDateTime(reqDto.getDisplayEndDate()));
+        builder.orderDeadlineDate(DateTimeUtils.convertStringToLocalDateTime(reqDto.getOrderDeadlineDate()));
     }
 }

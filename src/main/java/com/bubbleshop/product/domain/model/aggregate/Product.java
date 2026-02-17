@@ -14,7 +14,6 @@ import jakarta.persistence.*;
 import jdk.jfr.Description;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.ObjectUtils;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -77,6 +76,14 @@ public class Product extends TimeEntity implements Serializable {
     @Column(name = "display_end_dt")
     private LocalDateTime displayEndDate;
 
+    @Description("주문 예약 마감일")
+    @Column(name = "order_deadline_dt")
+    private LocalDateTime orderDeadlineDate;
+
+    @Description("주문수")
+    @Column(name = "order_cnt")
+    private int orderCount;
+
     @OneToMany(mappedBy = "product", targetEntity = ProductImage.class, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties({"product"})
     private List<ProductImage> images = new ArrayList<>();
@@ -103,6 +110,7 @@ public class Product extends TimeEntity implements Serializable {
         this.isSale = false;
         this.displayStartDate = command.getDisplayStartDate();
         this.displayEndDate = command.getDisplayEndDate();
+        this.orderDeadlineDate = command.getOrderDeadlineDate();
         this.createProductFeatures(command.getFeatureTypes());
         this.createProductImages(command.getThumbnailImageName(), command.getDetailImageName());
         this.createProductOptions(command.getOptionName(), command.getDefaultOptionName());
@@ -162,6 +170,11 @@ public class Product extends TimeEntity implements Serializable {
                     this.createProductFeature(featureType);
                 }
             });
+
+            // 없어진 태그일 경우 삭제
+            Set<FeatureType> deleteSet = new HashSet<>(existingFeatures.keySet());
+            deleteSet.removeAll(featureTypes);
+            this.features.removeIf(feature -> deleteSet.contains(feature.getProductFeatureId().getFeatureType()));
         } else {
             // 전체 삭제
             this.features.clear();

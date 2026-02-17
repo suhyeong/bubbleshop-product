@@ -1,7 +1,9 @@
 package com.bubbleshop.product.infrastructure.jpa;
 
 import com.bubbleshop.product.domain.command.GetProductListCommand;
+import com.bubbleshop.product.domain.constant.FeatureType;
 import com.bubbleshop.product.domain.model.aggregate.QCategory;
+import com.bubbleshop.product.domain.model.view.MainProductView;
 import com.bubbleshop.product.domain.model.view.ProductView;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
@@ -9,9 +11,12 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.bubbleshop.constants.StaticValues.MAIN_PRODUCT_COUNT;
 import static com.bubbleshop.product.domain.model.aggregate.QProduct.product;
+import static com.bubbleshop.product.domain.model.entity.QProductFeature.productFeature;
 
 public class ProductCustomRepositoryImpl extends QuerydslRepositorySupport implements ProductCustomRepository {
 
@@ -63,6 +68,45 @@ public class ProductCustomRepositoryImpl extends QuerydslRepositorySupport imple
                 .where(this.whereProductList(command))
                 .limit(command.getPageable().getPageSize())
                 .offset(command.getPageable().getOffset())
+                .fetch();
+    }
+
+    @Override
+    public List<MainProductView> findProductListByOrderCnt() {
+        LocalDateTime now = LocalDateTime.now();
+        return jpaQueryFactory
+                .select(Projections.constructor(MainProductView.class, product))
+                .from(product)
+                .where(product.displayStartDate.loe(now).and(product.displayEndDate.goe(now)))
+                .orderBy(product.orderCount.desc(), product.productCode.asc())
+                .limit(MAIN_PRODUCT_COUNT)
+                .fetch();
+    }
+
+    @Override
+    public List<MainProductView> findProductListByOrderDeadlineDate() {
+        LocalDateTime now = LocalDateTime.now();
+        return jpaQueryFactory
+                .select(Projections.constructor(MainProductView.class, product))
+                .from(product)
+                .where(product.displayStartDate.loe(now).and(product.displayEndDate.goe(now))
+                        .and(product.orderDeadlineDate.goe(now)))
+                .orderBy(product.orderDeadlineDate.asc(), product.productCode.asc())
+                .limit(MAIN_PRODUCT_COUNT)
+                .fetch();
+    }
+
+    @Override
+    public List<MainProductView> findProductListByFeature(FeatureType featureType) {
+        LocalDateTime now = LocalDateTime.now();
+        return jpaQueryFactory
+                .select(Projections.constructor(MainProductView.class, product))
+                .from(product)
+                .join(productFeature).on(productFeature.productFeatureId.productCode.eq(product.productCode))
+                .where(product.displayStartDate.loe(now).and(product.displayEndDate.goe(now))
+                        .and(productFeature.productFeatureId.featureType.eq(featureType)))
+                .orderBy(product.modifiedDate.desc())
+                .limit(MAIN_PRODUCT_COUNT)
                 .fetch();
     }
 

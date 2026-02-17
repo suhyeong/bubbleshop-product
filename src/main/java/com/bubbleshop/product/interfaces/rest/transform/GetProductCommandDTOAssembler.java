@@ -16,7 +16,8 @@ public abstract class GetProductCommandDTOAssembler {
             @Mapping(target = "options", source = "options", qualifiedByName = "GetProductRspDto.List<GetProductOptionRspDto>"),
             @Mapping(target = "points", source = "points", qualifiedByName = "GetProductRspDto.List<GetProductPointRspDto>"),
             @Mapping(target = "displayStartDate", expression = "java( DateTimeUtils.convertDateTimeToString(DateTimeUtils.DATE_FORMAT_YYYY_MM_DD_HH_MM_SS, view.getDisplayStartDate()) )"),
-            @Mapping(target = "displayEndDate", expression = "java( DateTimeUtils.convertDateTimeToString(DateTimeUtils.DATE_FORMAT_YYYY_MM_DD_HH_MM_SS, view.getDisplayEndDate()) )")
+            @Mapping(target = "displayEndDate", expression = "java( DateTimeUtils.convertDateTimeToString(DateTimeUtils.DATE_FORMAT_YYYY_MM_DD_HH_MM_SS, view.getDisplayEndDate()) )"),
+            @Mapping(target = "orderDeadlineDate", expression = "java( DateTimeUtils.convertDateTimeToString(DateTimeUtils.DATE_FORMAT_YYYY_MM_DD_HH_MM_SS, view.getOrderDeadlineDate()) )")
     })
     public abstract GetProductRspDto toPrdRspDto(ProductView view);
 
