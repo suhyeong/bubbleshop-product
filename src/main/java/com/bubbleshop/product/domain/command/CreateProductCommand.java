@@ -31,6 +31,7 @@ public class CreateProductCommand {
     private Set<CreateProductPointCommand> points;
     private LocalDateTime displayStartDate;
     private LocalDateTime displayEndDate;
+    private LocalDateTime orderDeadlineDate;
 
     public boolean isThumbnailImageExist() {
         return StringUtils.isNotBlank(this.thumbnailImageName);

@@ -29,4 +29,5 @@ public class CreateProductReqDto {
     private List<String> detailImageName;
     private String displayStartDate;
     private String displayEndDate;
+    private String orderDeadlineDate;
 }

@@ -35,6 +35,7 @@ public class ProductView {
     private Boolean isSale;
     private LocalDateTime displayStartDate;
     private LocalDateTime displayEndDate;
+    private LocalDateTime orderDeadlineDate;
 
     private List<ProductImageView> imageList;
     private List<ProductFeatureView> featureTypes;
@@ -56,6 +57,7 @@ public class ProductView {
         this.isSale = product.isSale();
         this.displayStartDate = product.getDisplayStartDate();
         this.displayEndDate = product.getDisplayEndDate();
+        this.orderDeadlineDate = product.getOrderDeadlineDate();
 
         this.featureTypes = new ArrayList<>();
         product.getFeatures().forEach(feature -> featureTypes.add(new ProductFeatureView(feature)));
